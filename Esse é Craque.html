@@ -1,0 +1,1101 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Esse é Craque — Prototype</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+<template id="__bundler_thumbnail" data-bg-color="#071a0e">
+  <svg viewBox="0 0 400 400" xmlns="http://www.w3.org/2000/svg">
+    <!-- Field background -->
+    <rect width="400" height="400" fill="#071a0e"/>
+    <!-- Field lines -->
+    <circle cx="200" cy="200" r="80" fill="none" stroke="rgba(255,255,255,0.2)" stroke-width="2"/>
+    <line x1="200" y1="20" x2="200" y2="380" stroke="rgba(255,255,255,0.15)" stroke-width="1.5"/>
+    <rect x="20" y="20" width="360" height="360" fill="none" stroke="rgba(255,255,255,0.15)" stroke-width="1.5"/>
+    <!-- Logo circle -->
+    <circle cx="200" cy="200" r="60" fill="#f0b429"/>
+    <circle cx="200" cy="200" r="55" fill="#0f5c28"/>
+    <circle cx="200" cy="200" r="44" fill="#0a1628"/>
+    <ellipse cx="200" cy="214" rx="36" ry="20" fill="#cc1f36"/>
+    <!-- Football icon -->
+    <circle cx="200" cy="178" r="14" fill="white"/>
+    <!-- Text -->
+    <text x="200" y="208" text-anchor="middle" fill="white" font-size="10" font-weight="900" font-family="sans-serif">ESSE É</text>
+    <text x="200" y="221" text-anchor="middle" fill="#f0b429" font-size="12" font-weight="900" font-family="sans-serif">CRAQUE</text>
+  </svg>
+</template>
+<script src="https://unpkg.com/react@18.3.1/umd/react.development.js" integrity="sha384-hD6/rw4ppMLGNu3tX5cjIb+uRZ7UkRJ6BPkLpg4hAu/6onKUg4lLsHAs9EBPT82L" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.development.js" integrity="sha384-u6aeetuaXnQ38mYT8rp6sbXaQe3NL9t+IBXmnYxwkUI2Hw4bsp2Wvmx4yRQF1uAm" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js" integrity="sha384-m08KidiNqLdpJqLq95G/LEi8Qvjl/xUYll3QILypMoQ65QorJ9Lvtp2RXYGBFj1y" crossorigin="anonymous"></script>
+<script type="text/babel" src="ios-frame.jsx"></script>
+<script type="text/babel" src="tweaks-panel.jsx"></script>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: 'Outfit', sans-serif;
+    background: #071a0e;
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+  }
+  #root { width: 100%; height: 100vh; display: flex; align-items: center; justify-content: center; }
+
+  /* Football field background */
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background:
+      repeating-linear-gradient(
+        180deg,
+        rgba(255,255,255,0.025) 0px,
+        rgba(255,255,255,0.025) 1px,
+        transparent 1px,
+        transparent 80px
+      ),
+      repeating-linear-gradient(
+        90deg,
+        rgba(255,255,255,0.015) 0px,
+        rgba(255,255,255,0.015) 1px,
+        transparent 1px,
+        transparent 120px
+      ),
+      linear-gradient(160deg, #071a0e 0%, #0b2e14 40%, #0a2510 60%, #071a0e 100%);
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  /* Animated glow orbs */
+  body::after {
+    content: '';
+    position: fixed;
+    width: 600px; height: 600px;
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba(15,80,40,0.35) 0%, transparent 70%);
+    top: -100px; left: 50%;
+    transform: translateX(-50%);
+    pointer-events: none;
+    z-index: 0;
+    animation: pulse 6s ease-in-out infinite;
+  }
+
+  @keyframes pulse {
+    0%, 100% { opacity: 0.7; transform: translateX(-50%) scale(1); }
+    50%       { opacity: 1;   transform: translateX(-50%) scale(1.1); }
+  }
+
+  .field-bg {
+    position: fixed; inset: 0; pointer-events: none; z-index: 0;
+  }
+</style>
+</head>
+<body>
+<div id="root"></div>
+<script type="text/babel">
+const { useState, useEffect, useRef } = React;
+
+const TWEAK_DEFAULTS = /*EDITMODE-BEGIN*/{
+  "accentColor": "#cc1f36",
+  "darkMode": false,
+  "showAIAnalysis": true,
+  "feedStyle": "card"
+}/*EDITMODE-END*/;
+
+// ─── BRAND COLORS ───────────────────────────────────────────────────────────
+const C = {
+  navy:    '#0a1628',
+  blue:    '#0d3068',
+  red:     '#cc1f36',
+  gold:    '#f0b429',
+  white:   '#ffffff',
+  bg:      '#f0f3f8',
+  bgCard:  '#ffffff',
+  text:    '#0a1628',
+  sub:     '#5a6a80',
+  border:  '#e2e8f0',
+  green:   '#0f9b5f',
+  purple:  '#7c3aed',
+};
+
+// ─── LOGO SVG ────────────────────────────────────────────────────────────────
+const Logo = ({ size = 48 }) => (
+  <svg width={size} height={size} viewBox="0 0 64 64">
+    {/* Outer ring - gold */}
+    <circle cx="32" cy="32" r="31" fill={C.gold}/>
+    {/* Green grass ring */}
+    <circle cx="32" cy="32" r="28" fill="#0f5c28"/>
+    {/* Inner navy circle */}
+    <circle cx="32" cy="32" r="22" fill={C.navy}/>
+    {/* Red banner */}
+    <ellipse cx="32" cy="36" rx="18" ry="10" fill={C.red}/>
+    {/* Ball icon top */}
+    <circle cx="32" cy="22" r="7" fill="white"/>
+    <polygon points="32,16 36,20 34,25 30,25 28,20" fill="#1a1a1a" transform="scale(0.7) translate(13.7,8)"/>
+    {/* Text */}
+    <text x="32" y="34" textAnchor="middle" fill="white" fontSize="6" fontWeight="900" fontFamily="Outfit,sans-serif" letterSpacing="0.3">ESSE É</text>
+    <text x="32" y="42" textAnchor="middle" fill={C.gold} fontSize="7.5" fontWeight="900" fontFamily="Outfit,sans-serif" letterSpacing="0.5">CRAQUE</text>
+    {/* Dashed border */}
+    <circle cx="32" cy="32" r="30" fill="none" stroke={C.gold} strokeWidth="0.8" strokeDasharray="3 2" opacity="0.6"/>
+  </svg>
+);
+
+// ─── BADGE VERIFICADO ─────────────────────────────────────────────────────────
+const Verified = ({ size = 14 }) => (
+  <svg width={size} height={size} viewBox="0 0 14 14">
+    <circle cx="7" cy="7" r="7" fill={C.blue}/>
+    <path d="M3.5 7l2.5 2.5 4.5-4.5" stroke="white" strokeWidth="1.5" fill="none" strokeLinecap="round" strokeLinejoin="round"/>
+  </svg>
+);
+
+// ─── STAR RATING ─────────────────────────────────────────────────────────────
+const StarRow = ({ score, max = 100, label }) => {
+  const pct = (score / max) * 100;
+  const color = pct > 75 ? C.green : pct > 50 ? C.gold : C.red;
+  return (
+    <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 5 }}>
+      <span style={{ fontSize: 10, color: C.sub, width: 72, flexShrink: 0 }}>{label}</span>
+      <div style={{ flex: 1, height: 5, background: C.border, borderRadius: 3, overflow: 'hidden' }}>
+        <div style={{ width: `${pct}%`, height: '100%', background: color, borderRadius: 3, transition: 'width 0.6s ease' }} />
+      </div>
+      <span style={{ fontSize: 11, fontWeight: 700, color, width: 26, textAlign: 'right' }}>{score}</span>
+    </div>
+  );
+};
+
+// ─── RADAR CHART ──────────────────────────────────────────────────────────────
+const RadarChart = ({ attrs, size = 120, color = C.red }) => {
+  const cx = size / 2, cy = size / 2, r = size * 0.38;
+  const n = attrs.length;
+  const pts = attrs.map((a, i) => {
+    const angle = (Math.PI * 2 * i / n) - Math.PI / 2;
+    const ratio = a.val / 100;
+    return { x: cx + r * ratio * Math.cos(angle), y: cy + r * ratio * Math.sin(angle),
+      lx: cx + (r + 14) * Math.cos(angle), ly: cy + (r + 14) * Math.sin(angle), label: a.label, val: a.val };
+  });
+  const gridPts = (frac) => attrs.map((_, i) => {
+    const angle = (Math.PI * 2 * i / n) - Math.PI / 2;
+    return `${cx + r * frac * Math.cos(angle)},${cy + r * frac * Math.sin(angle)}`;
+  }).join(' ');
+  return (
+    <svg width={size} height={size} viewBox={`0 0 ${size} ${size}`}>
+      {[0.25, 0.5, 0.75, 1].map(f => <polygon key={f} points={gridPts(f)} fill="none" stroke={C.border} strokeWidth="0.8" />)}
+      {pts.map((p, i) => <line key={i} x1={cx} y1={cy} x2={cx + r * Math.cos((Math.PI*2*i/n)-Math.PI/2)} y2={cy + r * Math.sin((Math.PI*2*i/n)-Math.PI/2)} stroke={C.border} strokeWidth="0.8" />)}
+      <polygon points={pts.map(p=>`${p.x},${p.y}`).join(' ')} fill={color + '33'} stroke={color} strokeWidth="1.5" />
+      {pts.map((p, i) => <circle key={i} cx={p.x} cy={p.y} r="2.5" fill={color} />)}
+      {pts.map((p, i) => (
+        <text key={i} x={p.lx} y={p.ly} textAnchor="middle" dominantBaseline="middle" fontSize="7" fill={C.text} fontWeight="600">{p.label}</text>
+      ))}
+    </svg>
+  );
+};
+
+// ─── AVATAR PLACEHOLDER ───────────────────────────────────────────────────────
+const Avatar = ({ name, size = 36, bg = C.blue }) => {
+  const initials = name.split(' ').map(w=>w[0]).join('').slice(0,2).toUpperCase();
+  return (
+    <div style={{ width: size, height: size, borderRadius: '50%', background: bg, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, border: `2px solid ${C.gold}` }}>
+      <span style={{ fontSize: size * 0.35, fontWeight: 700, color: 'white' }}>{initials}</span>
+    </div>
+  );
+};
+
+// ─── VIDEO PLACEHOLDER ────────────────────────────────────────────────────────
+const VideoThumb = ({ label = 'Lance de futebol', aspect = '16/9', tag, score }) => (
+  <div style={{ aspectRatio: aspect, background: '#1a2a3a', borderRadius: 10, position: 'relative', overflow: 'hidden', flexShrink: 0 }}>
+    <svg width="100%" height="100%" viewBox="0 0 160 90" preserveAspectRatio="xMidYMid slice">
+      <rect width="160" height="90" fill="#1a2a3a"/>
+      {[0,1,2,3,4,5].map(i=><line key={i} x1="0" y1={i*18} x2="160" y2={i*18} stroke="#ffffff08" strokeWidth="1"/>)}
+      {[0,1,2,3,4,5,6,7].map(i=><line key={i} x1={i*24} y1="0" x2={i*24} y2="90" stroke="#ffffff08" strokeWidth="1"/>)}
+      <text x="80" y="42" textAnchor="middle" fill="#ffffff30" fontSize="9" fontFamily="monospace">{label}</text>
+    </svg>
+    <div style={{ position:'absolute', top:'50%', left:'50%', transform:'translate(-50%,-50%)', width:32, height:32, borderRadius:'50%', background:'rgba(255,255,255,0.15)', backdropFilter:'blur(4px)', display:'flex', alignItems:'center', justifyContent:'center' }}>
+      <svg width="14" height="14" viewBox="0 0 14 14"><polygon points="3,2 11,7 3,12" fill="white"/></svg>
+    </div>
+    {tag && <div style={{ position:'absolute', bottom:6, left:6, background:C.red, color:'white', fontSize:9, fontWeight:700, padding:'2px 6px', borderRadius:4 }}>{tag}</div>}
+    {score != null && <div style={{ position:'absolute', top:6, right:6, background:C.gold, color:C.navy, fontSize:10, fontWeight:800, padding:'2px 7px', borderRadius:5 }}>{score}</div>}
+  </div>
+);
+
+// ─── BOTTOM NAV ───────────────────────────────────────────────────────────────
+const NAV_ITEMS = [
+  { id:'feed', icon:'⚽', label:'Feed' },
+  { id:'busca', icon:'🔍', label:'Busca' },
+  { id:'upload', icon:'➕', label:'Postar' },
+  { id:'ranking', icon:'🏆', label:'Ranking' },
+  { id:'perfil', icon:'👤', label:'Meu Perfil' },
+];
+
+const BottomNav = ({ screen, go }) => (
+  <div style={{ display:'flex', borderTop:`1px solid ${C.border}`, background:'white', paddingBottom:0 }}>
+    {NAV_ITEMS.map(n => (
+      <button key={n.id} onClick={() => go(n.id)} style={{ flex:1, background:'none', border:'none', padding:'8px 0 6px', display:'flex', flexDirection:'column', alignItems:'center', gap:2, cursor:'pointer' }}>
+        <span style={{ fontSize: n.id === 'upload' ? 20 : 16, filter: n.id==='upload' ? 'none' : undefined }}>{n.icon}</span>
+        <span style={{ fontSize:9, fontWeight: screen===n.id ? 700 : 400, color: screen===n.id ? C.red : C.sub }}>{n.label}</span>
+      </button>
+    ))}
+  </div>
+);
+
+// ═══════════════════════════════════════════════════════════════════════════════
+// SCREENS
+// ═══════════════════════════════════════════════════════════════════════════════
+
+// ─── 1. LOGIN ─────────────────────────────────────────────────────────────────
+const LoginScreen = ({ go }) => {
+  const [tab, setTab] = useState('login');
+  const [email, setEmail] = useState('');
+  const [senha, setSenha] = useState('');
+  return (
+    <div style={{ flex:1, background: `linear-gradient(160deg, #071a0e 0%, #0f3a1c 60%, #0a2510 100%)`, display:'flex', flexDirection:'column', alignItems:'center', justifyContent:'center', padding:'24px 20px', gap:20, position:'relative', overflow:'hidden' }}>
+      {/* mini field lines on login */}
+      <svg style={{ position:'absolute', inset:0, width:'100%', height:'100%', opacity:0.12, pointerEvents:'none' }} viewBox="0 0 300 500" preserveAspectRatio="xMidYMid slice">
+        <circle cx="150" cy="250" r="70" fill="none" stroke="white" strokeWidth="1"/>
+        <line x1="150" y1="0" x2="150" y2="500" stroke="white" strokeWidth="0.8"/>
+        <rect x="10" y="10" width="280" height="480" fill="none" stroke="white" strokeWidth="1"/>
+        {[0,1,2,3,4].map(i=><rect key={i} x={10+i*56} y="10" width="28" height="480" fill={i%2===0?"rgba(255,255,255,0.03)":"transparent"}/>)}
+      </svg>
+      <Logo size={72} />
+      <div>
+        <h1 style={{ color:'white', fontSize:22, fontWeight:900, textAlign:'center', letterSpacing:-0.5 }}>Esse é Craque</h1>
+        <p style={{ color:'rgba(255,255,255,0.6)', fontSize:12, textAlign:'center', marginTop:3 }}>A revolução no scouting de futebol</p>
+      </div>
+      {/* Tab */}
+      <div style={{ display:'flex', background:'rgba(255,255,255,0.1)', borderRadius:10, padding:3, width:'100%' }}>
+        {['login','cadastro'].map(t => (
+          <button key={t} onClick={()=>setTab(t)} style={{ flex:1, padding:'8px', borderRadius:8, border:'none', background: tab===t ? 'white' : 'transparent', color: tab===t ? C.navy : 'rgba(255,255,255,0.7)', fontWeight:700, fontSize:13, cursor:'pointer', fontFamily:'Outfit,sans-serif', transition:'all 0.2s' }}>
+            {t==='login' ? 'Entrar' : 'Cadastrar'}
+          </button>
+        ))}
+      </div>
+      {tab === 'login' ? (
+        <div style={{ width:'100%', display:'flex', flexDirection:'column', gap:10 }}>
+          <input placeholder="E-mail" value={email} onChange={e=>setEmail(e.target.value)}
+            style={{ width:'100%', padding:'12px 14px', borderRadius:10, border:`1.5px solid rgba(255,255,255,0.2)`, background:'rgba(255,255,255,0.08)', color:'white', fontSize:13, fontFamily:'Outfit,sans-serif', outline:'none' }} />
+          <input type="password" placeholder="Senha" value={senha} onChange={e=>setSenha(e.target.value)}
+            style={{ width:'100%', padding:'12px 14px', borderRadius:10, border:`1.5px solid rgba(255,255,255,0.2)`, background:'rgba(255,255,255,0.08)', color:'white', fontSize:13, fontFamily:'Outfit,sans-serif', outline:'none' }} />
+          <button onClick={() => go('feed')} style={{ width:'100%', padding:'13px', borderRadius:10, background:C.red, border:'none', color:'white', fontWeight:800, fontSize:14, cursor:'pointer', fontFamily:'Outfit,sans-serif', marginTop:4 }}>
+            Entrar
+          </button>
+          <p style={{ textAlign:'center', color:'rgba(255,255,255,0.5)', fontSize:11 }}>Esqueci minha senha</p>
+          <div style={{ display:'flex', alignItems:'center', gap:8 }}>
+            <div style={{ flex:1, height:1, background:'rgba(255,255,255,0.15)' }}/>
+            <span style={{ color:'rgba(255,255,255,0.4)', fontSize:11 }}>ou continue com</span>
+            <div style={{ flex:1, height:1, background:'rgba(255,255,255,0.15)' }}/>
+          </div>
+          <button style={{ width:'100%', padding:'11px', borderRadius:10, background:'rgba(255,255,255,0.1)', border:'1.5px solid rgba(255,255,255,0.2)', color:'white', fontWeight:600, fontSize:13, cursor:'pointer', fontFamily:'Outfit,sans-serif', display:'flex', alignItems:'center', justifyContent:'center', gap:8 }}>
+            <span style={{ fontSize:16 }}>🇬</span> Google
+          </button>
+        </div>
+      ) : (
+        <div style={{ width:'100%', display:'flex', flexDirection:'column', gap:10 }}>
+          {['Nome completo','E-mail','Senha','Confirmar senha'].map((p,i)=>(
+            <input key={i} type={i>=2?'password':'text'} placeholder={p}
+              style={{ width:'100%', padding:'12px 14px', borderRadius:10, border:'1.5px solid rgba(255,255,255,0.2)', background:'rgba(255,255,255,0.08)', color:'white', fontSize:13, fontFamily:'Outfit,sans-serif', outline:'none' }} />
+          ))}
+          <div style={{ display:'flex', gap:8 }}>
+            {['Atleta','Olheiro','Clube','Torcedor'].map(t => (
+              <button key={t} style={{ flex:1, padding:'8px 0', borderRadius:8, border:`1.5px solid rgba(255,255,255,0.2)`, background:'rgba(255,255,255,0.08)', color:'rgba(255,255,255,0.7)', fontSize:10, fontWeight:600, cursor:'pointer', fontFamily:'Outfit,sans-serif' }}>{t}</button>
+            ))}
+          </div>
+          <button onClick={() => go('feed')} style={{ width:'100%', padding:'13px', borderRadius:10, background:C.red, border:'none', color:'white', fontWeight:800, fontSize:14, cursor:'pointer', fontFamily:'Outfit,sans-serif' }}>
+            Criar conta
+          </button>
+          <p style={{ textAlign:'center', color:'rgba(255,255,255,0.4)', fontSize:10 }}>Ao criar sua conta, você concorda com os termos de uso</p>
+        </div>
+      )}
+    </div>
+  );
+};
+
+// ─── 2. FEED ─────────────────────────────────────────────────────────────────
+const athletes = [
+  { id:1, name:'João Carlos Silva', pos:'Atacante', city:'São Paulo, SP', age:17, nota:87, views:'12,4k', likes:341, verified:false, bg:'#1a4a8a', tag:'GOL', attrs:[{label:'Fin',val:88},{label:'Vel',val:85},{label:'Drb',val:91},{label:'Pos',val:79},{label:'Mov',val:82}] },
+  { id:2, name:'Rafael Mendes', pos:'Meio-campo', city:'Rio de Janeiro, RJ', age:19, nota:79, views:'8,2k', likes:198, verified:false, bg:'#2a1a6a', tag:'PASSE', attrs:[{label:'Pas',val:87},{label:'Vis',val:83},{label:'Ctr',val:79},{label:'Rec',val:71},{label:'Dec',val:84}] },
+  { id:3, name:'Bruno Tavares', pos:'Zagueiro', city:'Belo Horizonte, MG', age:20, nota:82, views:'5,7k', likes:127, verified:true, bg:'#1a4a2a', tag:'DESARME', attrs:[{label:'Mar',val:88},{label:'Ant',val:85},{label:'Aér',val:80},{label:'Sai',val:70},{label:'For',val:86}] },
+  { id:4, name:'Pedro Alves', pos:'Goleiro', city:'Curitiba, PR', age:16, nota:74, views:'3,1k', likes:89, verified:false, bg:'#4a2a1a', tag:'DEFESA', attrs:[{label:'Ref',val:82},{label:'Pos',val:76},{label:'Aér',val:71},{label:'Dis',val:68},{label:'Pés',val:60}] },
+];
+
+const FeedCard = ({ athlete, go }) => (
+  <div style={{ background:'white', borderRadius:14, overflow:'hidden', boxShadow:'0 2px 12px rgba(0,0,0,0.07)', marginBottom:12 }}>
+    <div style={{ padding:'10px 12px', display:'flex', alignItems:'center', gap:8 }}>
+      <Avatar name={athlete.name} size={34} bg={athlete.bg} />
+      <div style={{ flex:1 }}>
+        <div style={{ display:'flex', alignItems:'center', gap:4 }}>
+          <span style={{ fontSize:12, fontWeight:700, color:C.text }}>{athlete.name}</span>
+          {athlete.verified && <Verified size={12}/>}
+        </div>
+        <span style={{ fontSize:10, color:C.sub }}>{athlete.pos} · {athlete.city} · {athlete.age} anos</span>
+      </div>
+      <div style={{ background:C.navy, borderRadius:8, padding:'4px 8px', textAlign:'center' }}>
+        <div style={{ fontSize:14, fontWeight:900, color:C.gold }}>{athlete.nota}</div>
+        <div style={{ fontSize:7, color:'rgba(255,255,255,0.6)', fontWeight:600 }}>NOTA</div>
+      </div>
+    </div>
+    <div style={{ padding:'0 12px' }}>
+      <VideoThumb tag={athlete.tag} score={athlete.nota} />
+    </div>
+    <div style={{ padding:'8px 12px', display:'flex', gap:12, alignItems:'center' }}>
+      <button onClick={() => go('video', athlete)} style={{ display:'flex', alignItems:'center', gap:4, background:'none', border:'none', color:C.sub, fontSize:11, cursor:'pointer', fontFamily:'Outfit,sans-serif' }}>
+        ▶ Análise IA
+      </button>
+      <span style={{ fontSize:11, color:C.sub }}>❤️ {athlete.likes}</span>
+      <span style={{ fontSize:11, color:C.sub }}>👁 {athlete.views}</span>
+      <div style={{ marginLeft:'auto', display:'flex', gap:6 }}>
+        {['🌟','💬','🔖'].map((ic,i)=>(
+          <button key={i} style={{ background:'none', border:'none', fontSize:15, cursor:'pointer' }}>{ic}</button>
+        ))}
+      </div>
+    </div>
+  </div>
+);
+
+const FeedScreen = ({ go }) => {
+  const [tab, setTab] = useState('paravoce');
+  return (
+    <div style={{ flex:1, display:'flex', flexDirection:'column', background:C.bg, overflow:'hidden' }}>
+      {/* Header */}
+      <div style={{ padding:'12px 14px 8px', background:'white', borderBottom:`1px solid ${C.border}` }}>
+        <div style={{ display:'flex', alignItems:'center', justifyContent:'space-between' }}>
+          <Logo size={32} />
+          <div style={{ display:'flex', gap:8, alignItems:'center' }}>
+            <button onClick={()=>go('notif')} style={{ background:C.bg, border:'none', borderRadius:8, width:32, height:32, display:'flex', alignItems:'center', justifyContent:'center', cursor:'pointer', fontSize:16, position:'relative' }}>
+              🔔
+              <div style={{ position:'absolute', top:4, right:4, width:8, height:8, background:C.red, borderRadius:'50%' }}/>
+            </button>
+          </div>
+        </div>
+        <div style={{ display:'flex', gap:6, marginTop:10 }}>
+          {[{id:'paravoce',label:'Pra Você'},{id:'seguindo',label:'Seguindo'},{id:'emalta',label:'Em Alta 🔥'}].map(t=>(
+            <button key={t.id} onClick={()=>setTab(t.id)} style={{ padding:'5px 12px', borderRadius:20, border:'none', background: tab===t.id ? C.navy : C.bg, color: tab===t.id ? 'white' : C.sub, fontWeight: tab===t.id ? 700 : 400, fontSize:11, cursor:'pointer', fontFamily:'Outfit,sans-serif', transition:'all 0.2s' }}>{t.label}</button>
+          ))}
+        </div>
+      </div>
+      {/* Feed */}
+      <div style={{ flex:1, overflowY:'auto', padding:'12px' }}>
+        {athletes.map(a => <FeedCard key={a.id} athlete={a} go={go} />)}
+      </div>
+    </div>
+  );
+};
+
+// ─── 3. PERFIL DO ATLETA ─────────────────────────────────────────────────────
+const AtletaScreen = ({ go, athlete = athletes[0] }) => {
+  const [tab, setTab] = useState('videos');
+  return (
+    <div style={{ flex:1, display:'flex', flexDirection:'column', background:C.bg, overflow:'hidden' }}>
+      <div style={{ overflowY:'auto', flex:1 }}>
+        {/* Cover */}
+        <div style={{ height:110, background:`linear-gradient(135deg, ${athlete.bg}, #071a0e)`, position:'relative', overflow:'hidden' }}>
+          <svg style={{ position:'absolute', inset:0, width:'100%', height:'100%', opacity:0.18, pointerEvents:'none' }} viewBox="0 0 300 110" preserveAspectRatio="xMidYMid slice">
+            <circle cx="150" cy="55" r="42" fill="none" stroke="white" strokeWidth="1"/>
+            <line x1="150" y1="0" x2="150" y2="110" stroke="white" strokeWidth="0.8"/>
+            <rect x="5" y="5" width="290" height="100" fill="none" stroke="white" strokeWidth="0.8"/>
+          </svg>
+          <button onClick={()=>go('feed')} style={{ position:'absolute', top:12, left:12, background:'rgba(0,0,0,0.3)', border:'none', borderRadius:8, padding:'4px 8px', color:'white', fontSize:12, cursor:'pointer' }}>‹ Voltar</button>
+        </div>
+        {/* Info */}
+        <div style={{ padding:'0 14px 12px', background:'white', borderBottom:`1px solid ${C.border}` }}>
+          <div style={{ display:'flex', alignItems:'flex-end', gap:10, marginTop:-26, marginBottom:8 }}>
+            <div style={{ width:60, height:60, borderRadius:'50%', background:athlete.bg, border:`3px solid white`, display:'flex', alignItems:'center', justifyContent:'center' }}>
+              <span style={{ fontSize:22, fontWeight:900, color:C.gold }}>{athlete.name[0]}</span>
+            </div>
+            <div style={{ flex:1, paddingBottom:4 }}>
+              <div style={{ display:'flex', alignItems:'center', gap:6 }}>
+                <h2 style={{ fontSize:15, fontWeight:800, color:C.text }}>{athlete.name}</h2>
+                {athlete.verified && <Verified />}
+              </div>
+              <p style={{ fontSize:11, color:C.sub }}>{athlete.pos} · {athlete.city} · {athlete.age} anos</p>
+            </div>
+            <div style={{ background:C.navy, borderRadius:10, padding:'6px 12px', textAlign:'center' }}>
+              <div style={{ fontSize:22, fontWeight:900, color:C.gold }}>{athlete.nota}</div>
+              <div style={{ fontSize:8, color:'rgba(255,255,255,0.6)', fontWeight:600 }}>NOTA GERAL</div>
+            </div>
+          </div>
+          {/* Stats */}
+          <div style={{ display:'flex', gap:16, justifyContent:'center', padding:'8px 0', borderTop:`1px solid ${C.border}`, borderBottom:`1px solid ${C.border}`, marginBottom:10 }}>
+            {[{v:'47',l:'Vídeos'},{v:'2.1k',l:'Seguidores'},{v:'183',l:'Seguindo'},{v:'Top 8%',l:'Nacional'}].map((s,i)=>(
+              <div key={i} style={{ textAlign:'center' }}>
+                <div style={{ fontSize:14, fontWeight:800, color:C.text }}>{s.v}</div>
+                <div style={{ fontSize:9, color:C.sub }}>{s.l}</div>
+              </div>
+            ))}
+          </div>
+          <p style={{ fontSize:11, color:C.text, lineHeight:1.5 }}>Atacante com faro gol. Sonho jogar no Fluminense. Formado no fut de várzea. 🏅 Top 10 SP sub-17</p>
+          <div style={{ display:'flex', gap:6, marginTop:8 }}>
+            <button style={{ flex:1, padding:'8px', borderRadius:8, background:C.red, border:'none', color:'white', fontWeight:700, fontSize:12, cursor:'pointer', fontFamily:'Outfit,sans-serif' }}>Seguir</button>
+            <button onClick={()=>go('chat', athlete)} style={{ flex:1, padding:'8px', borderRadius:8, background:C.bg, border:`1px solid ${C.border}`, color:C.text, fontWeight:600, fontSize:12, cursor:'pointer', fontFamily:'Outfit,sans-serif' }}>Mensagem</button>
+            <button onClick={()=>go('proposta', athlete)} style={{ padding:'8px 10px', borderRadius:8, background:C.navy, border:'none', color:C.gold, fontWeight:700, fontSize:11, cursor:'pointer', fontFamily:'Outfit,sans-serif' }}>Proposta</button>
+          </div>
+        </div>
+
+        {/* Tabs */}
+        <div style={{ display:'flex', background:'white', borderBottom:`1px solid ${C.border}`, marginBottom:8 }}>
+          {[{id:'videos',l:'Vídeos'},{id:'metricas',l:'Métricas'},{id:'historico',l:'Histórico'}].map(t=>(
+            <button key={t.id} onClick={()=>setTab(t.id)} style={{ flex:1, padding:'10px', border:'none', background:'none', color: tab===t.id ? C.red : C.sub, fontWeight: tab===t.id ? 700 : 400, fontSize:12, cursor:'pointer', fontFamily:'Outfit,sans-serif', borderBottom: tab===t.id ? `2px solid ${C.red}` : '2px solid transparent' }}>{t.l}</button>
+          ))}
+        </div>
+
+        {tab === 'videos' && (
+          <div style={{ padding:'0 12px 12px', display:'grid', gridTemplateColumns:'1fr 1fr', gap:8 }}>
+            {['GOL','DRIBLE','ASSISTÊNCIA','DEFESA','PASSE-CHAVE','GOL'].map((tag,i)=>(
+              <div key={i} onClick={()=>go('video', athletes[i%athletes.length])} style={{ cursor:'pointer' }}>
+                <VideoThumb tag={tag} score={[87,72,68,80,75,90][i]} aspect="4/3"/>
+              </div>
+            ))}
+          </div>
+        )}
+
+        {tab === 'metricas' && (
+          <div style={{ padding:'12px' }}>
+            <div style={{ background:'white', borderRadius:14, padding:14, marginBottom:10 }}>
+              <div style={{ display:'flex', alignItems:'center', justifyContent:'space-between', marginBottom:10 }}>
+                <h3 style={{ fontSize:13, fontWeight:800, color:C.text }}>Atributos Técnicos</h3>
+                <span style={{ fontSize:10, color:C.sub }}>Últimos 90 dias</span>
+              </div>
+              <div style={{ display:'flex', justifyContent:'center', marginBottom:10 }}>
+                <RadarChart attrs={athlete.attrs} size={130} color={C.red} />
+              </div>
+              <div style={{ height:1, background:C.border, margin:'10px 0' }}/>
+              {athlete.attrs.map((a,i)=>(
+                <StarRow key={i} label={['Finalização','Velocidade','Drible','Posicionamento','Movimentação'][i]} score={a.val} />
+              ))}
+            </div>
+            <div style={{ background:'white', borderRadius:14, padding:14 }}>
+              <h3 style={{ fontSize:13, fontWeight:800, color:C.text, marginBottom:10 }}>Composição da Nota</h3>
+              <div style={{ display:'flex', gap:6 }}>
+                {[{pct:60,label:'IA',color:C.blue},{pct:30,label:'Comunidade',color:C.red},{pct:10,label:'Olheiros',color:C.gold}].map((b,i)=>(
+                  <div key={i} style={{ flex:1, textAlign:'center' }}>
+                    <div style={{ height:50, background:C.bg, borderRadius:8, overflow:'hidden', display:'flex', flexDirection:'column', justifyContent:'flex-end' }}>
+                      <div style={{ height:`${b.pct}%`, background:b.color, borderRadius:8, transition:'height 0.6s' }}/>
+                    </div>
+                    <div style={{ fontSize:10, fontWeight:700, color:b.color, marginTop:4 }}>{b.pct}%</div>
+                    <div style={{ fontSize:9, color:C.sub }}>{b.label}</div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+        )}
+
+        {tab === 'historico' && (
+          <div style={{ padding:'12px' }}>
+            <div style={{ background:'white', borderRadius:14, padding:14 }}>
+              <h3 style={{ fontSize:13, fontWeight:800, color:C.text, marginBottom:10 }}>Evolução da Nota</h3>
+              <svg width="100%" height="80" viewBox="0 0 280 80">
+                <polyline points="0,70 40,62 80,55 120,48 160,42 200,38 240,30 280,24" fill="none" stroke={C.red} strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"/>
+                <polyline points="0,70 40,62 80,55 120,48 160,42 200,38 240,30 280,24 280,80 0,80" fill={C.red + '20'} />
+                {[0,40,80,120,160,200,240,280].map((x,i)=>(
+                  <circle key={i} cx={x} cy={[70,62,55,48,42,38,30,24][i]} r="3" fill={C.red}/>
+                ))}
+              </svg>
+              <div style={{ display:'flex', justifyContent:'space-between', marginTop:4 }}>
+                {['Set','Out','Nov','Dez','Jan','Fev','Mar','Abr'].map(m=>(
+                  <span key={m} style={{ fontSize:8, color:C.sub }}>{m}</span>
+                ))}
+              </div>
+            </div>
+          </div>
+        )}
+      </div>
+    </div>
+  );
+};
+
+// ─── 4. ANÁLISE IA ────────────────────────────────────────────────────────────
+const VideoAnaliseScreen = ({ go, athlete = athletes[0] }) => {
+  const [rated, setRated] = useState({});
+  const [myScore, setMyScore] = useState(null);
+  return (
+    <div style={{ flex:1, display:'flex', flexDirection:'column', background:C.bg, overflow:'hidden' }}>
+      <div style={{ overflowY:'auto', flex:1 }}>
+        {/* Header */}
+        <div style={{ padding:'10px 14px', display:'flex', alignItems:'center', gap:8, background:'white', borderBottom:`1px solid ${C.border}` }}>
+          <button onClick={()=>go('feed')} style={{ background:'none', border:'none', fontSize:18, cursor:'pointer', color:C.text }}>‹</button>
+          <div style={{ flex:1 }}>
+            <h3 style={{ fontSize:13, fontWeight:800 }}>{athlete.name}</h3>
+            <p style={{ fontSize:10, color:C.sub }}>{athlete.pos} · {athlete.tag}</p>
+          </div>
+          <span style={{ fontSize:9, color:C.sub }}>12,4k visualizações</span>
+        </div>
+        {/* Video */}
+        <div style={{ padding:14, background:'white', borderBottom:`1px solid ${C.border}` }}>
+          <VideoThumb label="Lance principal" tag={athlete.tag} score={athlete.nota} />
+          <div style={{ display:'flex', gap:8, marginTop:10 }}>
+            {['❤️ 341','💬 28','🔖 Salvar','📤 Compartilhar'].map((a,i)=>(
+              <button key={i} style={{ background:C.bg, border:'none', borderRadius:8, padding:'6px 10px', fontSize:10, fontWeight:500, color:C.text, cursor:'pointer', fontFamily:'Outfit,sans-serif' }}>{a}</button>
+            ))}
+          </div>
+        </div>
+
+        {/* IA Analysis */}
+        <div style={{ padding:14 }}>
+          <div style={{ background:`linear-gradient(135deg, ${C.navy}, ${C.blue})`, borderRadius:14, padding:14, marginBottom:12 }}>
+            <div style={{ display:'flex', alignItems:'center', gap:8, marginBottom:10 }}>
+              <div style={{ width:28, height:28, borderRadius:8, background:C.gold, display:'flex', alignItems:'center', justifyContent:'center', fontSize:14 }}>🤖</div>
+              <div>
+                <h3 style={{ fontSize:13, fontWeight:800, color:'white' }}>Análise por IA</h3>
+                <p style={{ fontSize:10, color:'rgba(255,255,255,0.6)' }}>Processado em 42 segundos</p>
+              </div>
+              <div style={{ marginLeft:'auto', background:C.gold, borderRadius:10, padding:'4px 10px' }}>
+                <span style={{ fontSize:16, fontWeight:900, color:C.navy }}>{athlete.nota}</span>
+              </div>
+            </div>
+            <div style={{ display:'flex', flexDirection:'column', gap:5 }}>
+              {athlete.attrs.map((a,i)=>(
+                <div key={i} style={{ display:'flex', alignItems:'center', gap:8 }}>
+                  <span style={{ fontSize:10, color:'rgba(255,255,255,0.7)', width:80 }}>{['Finalização','Velocidade','Drible','Posicionamento','Movimentação'][i]}</span>
+                  <div style={{ flex:1, height:5, background:'rgba(255,255,255,0.15)', borderRadius:3, overflow:'hidden' }}>
+                    <div style={{ width:`${a.val}%`, height:'100%', background: a.val>80?C.green:a.val>65?C.gold:C.red, borderRadius:3 }}/>
+                  </div>
+                  <span style={{ fontSize:11, fontWeight:700, color:C.gold, width:24 }}>{a.val}</span>
+                </div>
+              ))}
+            </div>
+            <div style={{ marginTop:12, padding:'10px', background:'rgba(255,255,255,0.07)', borderRadius:10, borderLeft:`3px solid ${C.gold}` }}>
+              <p style={{ fontSize:11, color:'rgba(255,255,255,0.85)', lineHeight:1.6 }}>
+                <strong style={{ color:C.gold }}>Pontos fortes:</strong> Excelente drible em velocidade, finalização precisa com o pé direito e movimentação sem bola acima da média para a faixa etária.<br/>
+                <strong style={{ color:'#ff8a8a' }}>A melhorar:</strong> Posicionamento defensivo e comunicação com colegas em jogadas coletivas.
+              </p>
+            </div>
+            <div style={{ display:'flex', alignItems:'center', gap:6, marginTop:8 }}>
+              <span style={{ fontSize:10, color:'rgba(255,255,255,0.5)' }}>Resultado incorreto?</span>
+              <button style={{ background:'rgba(255,255,255,0.1)', border:'1px solid rgba(255,255,255,0.2)', borderRadius:6, padding:'3px 8px', color:'rgba(255,255,255,0.7)', fontSize:10, cursor:'pointer', fontFamily:'Outfit,sans-serif' }}>Contestar</button>
+            </div>
+          </div>
+
+          {/* Avaliação comunidade */}
+          <div style={{ background:'white', borderRadius:14, padding:14, marginBottom:12 }}>
+            <h3 style={{ fontSize:13, fontWeight:800, color:C.text, marginBottom:10 }}>Avaliação da Comunidade</h3>
+            <div style={{ display:'flex', gap:6, marginBottom:10, flexWrap:'wrap' }}>
+              {['Boa decisão ✅','Drible criativo 🎯','Finalização precisa ⚡','Postura 💪'].map((r,i)=>(
+                <button key={i} onClick={()=>setRated(p=>({...p,[i]:!p[i]}))} style={{ padding:'5px 9px', borderRadius:20, border:`1.5px solid ${rated[i]?C.red:C.border}`, background: rated[i]?C.red+'15':'transparent', color: rated[i]?C.red:C.sub, fontSize:10, cursor:'pointer', fontFamily:'Outfit,sans-serif', fontWeight: rated[i]?700:400 }}>{r}</button>
+              ))}
+            </div>
+            <p style={{ fontSize:11, color:C.sub, marginBottom:8 }}>Sua nota para este lance:</p>
+            <div style={{ display:'flex', gap:4, marginBottom:8 }}>
+              {[1,2,3,4,5,6,7,8,9,10].map(n=>(
+                <button key={n} onClick={()=>setMyScore(n)} style={{ flex:1, aspectRatio:'1', borderRadius:6, border:`1.5px solid ${myScore>=n?C.gold:C.border}`, background: myScore>=n?C.gold:C.bg, color: myScore>=n?C.navy:C.sub, fontWeight:700, fontSize:10, cursor:'pointer', fontFamily:'Outfit,sans-serif', transition:'all 0.15s' }}>{n}</button>
+              ))}
+            </div>
+            {myScore && <p style={{ fontSize:11, color:C.green, fontWeight:600 }}>✓ Nota {myScore} registrada! (peso: 1x usuário)</p>}
+          </div>
+
+          {/* Comparativo */}
+          <div style={{ background:'white', borderRadius:14, padding:14 }}>
+            <h3 style={{ fontSize:13, fontWeight:800, color:C.text, marginBottom:6 }}>Percentil na Categoria</h3>
+            <p style={{ fontSize:11, color:C.sub, marginBottom:10 }}>Atacantes sub-17 · Brasil</p>
+            <div style={{ height:8, background:C.bg, borderRadius:4, overflow:'hidden', marginBottom:6, position:'relative' }}>
+              <div style={{ width:'87%', height:'100%', background:`linear-gradient(90deg, ${C.blue}, ${C.red})`, borderRadius:4 }}/>
+              <div style={{ position:'absolute', right:'13%', top:-3, width:2, height:14, background:C.navy }}/>
+            </div>
+            <div style={{ display:'flex', justifyContent:'space-between' }}>
+              <span style={{ fontSize:10, color:C.sub }}>0</span>
+              <span style={{ fontSize:11, fontWeight:700, color:C.red }}>🔥 Top 13% nacional</span>
+              <span style={{ fontSize:10, color:C.sub }}>100</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+// ─── 5. BUSCA AVANÇADA ────────────────────────────────────────────────────────
+const BuscaScreen = ({ go }) => {
+  const [filters, setFilters] = useState({ pos:'Atacante', age:'Sub-17', region:'São Paulo', status:'todos' });
+  const [searched, setSearched] = useState(false);
+  const setF = (k,v) => setFilters(p=>({...p,[k]:v}));
+  return (
+    <div style={{ flex:1, display:'flex', flexDirection:'column', background:C.bg, overflow:'hidden' }}>
+      <div style={{ padding:'12px 14px', background:'white', borderBottom:`1px solid ${C.border}` }}>
+        <h2 style={{ fontSize:15, fontWeight:800, color:C.text, marginBottom:8 }}>Busca de Talentos</h2>
+        <div style={{ display:'flex', gap:8, alignItems:'center' }}>
+          <div style={{ flex:1, display:'flex', alignItems:'center', gap:8, background:C.bg, borderRadius:10, padding:'9px 12px' }}>
+            <span style={{ fontSize:14 }}>🔍</span>
+            <input placeholder="Buscar por nome, cidade, clube..." style={{ border:'none', background:'transparent', fontSize:12, color:C.text, outline:'none', width:'100%', fontFamily:'Outfit,sans-serif' }}/>
+          </div>
+        </div>
+      </div>
+
+      <div style={{ overflowY:'auto', flex:1 }}>
+        {/* Filters */}
+        <div style={{ padding:14, background:'white', marginBottom:8, borderBottom:`1px solid ${C.border}` }}>
+          <div style={{ display:'flex', alignItems:'center', justifyContent:'space-between', marginBottom:10 }}>
+            <h3 style={{ fontSize:12, fontWeight:700, color:C.text }}>Filtros Avançados</h3>
+            <button style={{ background:'none', border:'none', fontSize:11, color:C.red, fontWeight:600, cursor:'pointer', fontFamily:'Outfit,sans-serif' }}>Limpar</button>
+          </div>
+          {[
+            {label:'Posição', opts:['Atacante','Meio-campo','Zagueiro','Goleiro'], key:'pos'},
+            {label:'Categoria', opts:['Sub-13','Sub-15','Sub-17','Sub-20','Profissional'], key:'age'},
+            {label:'Região', opts:['São Paulo','Rio de Janeiro','Minas Gerais','Paraná'], key:'region'},
+            {label:'Status', opts:['todos','Sem clube','Com clube'], key:'status'},
+          ].map(f=>(
+            <div key={f.key} style={{ marginBottom:8 }}>
+              <p style={{ fontSize:10, color:C.sub, marginBottom:4 }}>{f.label}</p>
+              <div style={{ display:'flex', gap:4, flexWrap:'wrap' }}>
+                {f.opts.map(o=>(
+                  <button key={o} onClick={()=>setF(f.key,o)} style={{ padding:'5px 10px', borderRadius:16, border:`1.5px solid ${filters[f.key]===o?C.navy:C.border}`, background: filters[f.key]===o?C.navy:'transparent', color: filters[f.key]===o?'white':C.sub, fontSize:10, fontWeight: filters[f.key]===o?700:400, cursor:'pointer', fontFamily:'Outfit,sans-serif', transition:'all 0.2s' }}>{o}</button>
+                ))}
+              </div>
+            </div>
+          ))}
+          <div style={{ marginBottom:8 }}>
+            <p style={{ fontSize:10, color:C.sub, marginBottom:4 }}>Nota mínima: <strong>70</strong></p>
+            <input type="range" min={0} max={100} defaultValue={70} style={{ width:'100%', accentColor:C.red }}/>
+          </div>
+          <button onClick={()=>setSearched(true)} style={{ width:'100%', padding:'11px', borderRadius:10, background:C.red, border:'none', color:'white', fontWeight:700, fontSize:13, cursor:'pointer', fontFamily:'Outfit,sans-serif' }}>
+            🔍 Buscar atletas
+          </button>
+        </div>
+
+        {/* Results */}
+        {searched && (
+          <div style={{ padding:'0 14px 14px' }}>
+            <div style={{ display:'flex', justifyContent:'space-between', alignItems:'center', marginBottom:10, paddingTop:4 }}>
+              <span style={{ fontSize:12, fontWeight:700, color:C.text }}>127 atletas encontrados</span>
+              <button style={{ background:'none', border:'none', fontSize:11, color:C.blue, fontWeight:600, cursor:'pointer', fontFamily:'Outfit,sans-serif' }}>📥 Exportar CSV</button>
+            </div>
+            {athletes.map(a=>(
+              <div key={a.id} onClick={()=>go('atleta', a)} style={{ background:'white', borderRadius:12, padding:'10px 12px', marginBottom:8, display:'flex', gap:10, alignItems:'center', cursor:'pointer', boxShadow:'0 1px 6px rgba(0,0,0,0.05)' }}>
+                <Avatar name={a.name} size={42} bg={a.bg}/>
+                <div style={{ flex:1 }}>
+                  <div style={{ display:'flex', alignItems:'center', gap:4 }}>
+                    <span style={{ fontSize:12, fontWeight:700, color:C.text }}>{a.name}</span>
+                    {a.verified && <Verified size={12}/>}
+                  </div>
+                  <span style={{ fontSize:10, color:C.sub }}>{a.pos} · {a.city} · {a.age} anos</span>
+                  <div style={{ display:'flex', gap:6, marginTop:4 }}>
+                    {a.attrs.slice(0,3).map((at,i)=>(
+                      <span key={i} style={{ fontSize:9, background:C.bg, padding:'2px 5px', borderRadius:4, color:C.sub }}>{['Fin','Vel','Drb'][i]}: <strong style={{ color:C.text }}>{at.val}</strong></span>
+                    ))}
+                  </div>
+                </div>
+                <div style={{ textAlign:'center' }}>
+                  <div style={{ fontSize:18, fontWeight:900, color:C.gold, background:C.navy, borderRadius:8, padding:'4px 8px' }}>{a.nota}</div>
+                  <div style={{ fontSize:9, color:C.sub, marginTop:2 }}>nota</div>
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
+      </div>
+    </div>
+  );
+};
+
+// ─── 6. UPLOAD ────────────────────────────────────────────────────────────────
+const UploadScreen = ({ go }) => {
+  const [step, setStep] = useState(0);
+  const [tipo, setTipo] = useState(null);
+  const [contexto, setContexto] = useState(null);
+  const [uploading, setUploading] = useState(false);
+  const [done, setDone] = useState(false);
+
+  const handleUpload = () => {
+    setUploading(true);
+    setTimeout(()=>{ setUploading(false); setDone(true); }, 2000);
+  };
+
+  if (done) return (
+    <div style={{ flex:1, display:'flex', flexDirection:'column', alignItems:'center', justifyContent:'center', background:'white', padding:24, gap:16 }}>
+      <div style={{ width:64, height:64, borderRadius:'50%', background:C.green+'20', display:'flex', alignItems:'center', justifyContent:'center', fontSize:30 }}>✅</div>
+      <h2 style={{ fontSize:18, fontWeight:900, color:C.text, textAlign:'center' }}>Lance enviado!</h2>
+      <p style={{ fontSize:12, color:C.sub, textAlign:'center', lineHeight:1.6 }}>Sua IA está analisando o vídeo.<br/>Resultado em até 1 minuto.</p>
+      <div style={{ background:C.bg, borderRadius:14, padding:14, width:'100%' }}>
+        <div style={{ display:'flex', alignItems:'center', gap:8, marginBottom:8 }}>
+          <div style={{ width:24, height:24, borderRadius:'50%', background:C.gold, display:'flex', alignItems:'center', justifyContent:'center', fontSize:12 }}>🤖</div>
+          <span style={{ fontSize:12, fontWeight:700, color:C.text }}>IA Processando...</span>
+        </div>
+        {['Detectando jogador','Rastreando movimentos','Calculando métricas','Gerando relatório'].map((s,i)=>(
+          <div key={i} style={{ display:'flex', alignItems:'center', gap:8, marginBottom:5 }}>
+            <div style={{ width:14, height:14, borderRadius:'50%', background:C.green, display:'flex', alignItems:'center', justifyContent:'center', fontSize:8, color:'white' }}>✓</div>
+            <span style={{ fontSize:11, color:C.text }}>{s}</span>
+          </div>
+        ))}
+      </div>
+      <button onClick={()=>go('feed')} style={{ width:'100%', padding:'12px', borderRadius:10, background:C.red, border:'none', color:'white', fontWeight:700, fontSize:14, cursor:'pointer', fontFamily:'Outfit,sans-serif' }}>Ver no Feed</button>
+    </div>
+  );
+
+  return (
+    <div style={{ flex:1, display:'flex', flexDirection:'column', background:'white', overflow:'hidden' }}>
+      <div style={{ padding:'12px 14px', borderBottom:`1px solid ${C.border}` }}>
+        <h2 style={{ fontSize:15, fontWeight:800, color:C.text }}>Postar Lance</h2>
+        <div style={{ display:'flex', gap:4, marginTop:8 }}>
+          {[0,1,2].map(i=>(
+            <div key={i} style={{ flex:1, height:3, borderRadius:2, background: step>=i ? C.red : C.bg }}/>
+          ))}
+        </div>
+      </div>
+
+      <div style={{ flex:1, overflowY:'auto', padding:14 }}>
+        {step === 0 && (
+          <div style={{ display:'flex', flexDirection:'column', gap:12 }}>
+            <h3 style={{ fontSize:13, fontWeight:700, color:C.text }}>Selecionar vídeo</h3>
+            <div style={{ border:`2px dashed ${C.border}`, borderRadius:14, padding:32, display:'flex', flexDirection:'column', alignItems:'center', gap:10 }}>
+              <span style={{ fontSize:36 }}>🎬</span>
+              <p style={{ fontSize:12, fontWeight:600, color:C.text }}>Escolher da galeria</p>
+              <p style={{ fontSize:10, color:C.sub }}>MP4, MOV · até 10 min</p>
+            </div>
+            <button style={{ width:'100%', padding:'12px', borderRadius:10, background:C.bg, border:`1.5px solid ${C.border}`, color:C.text, fontWeight:600, fontSize:13, cursor:'pointer', fontFamily:'Outfit,sans-serif', display:'flex', alignItems:'center', justifyContent:'center', gap:8 }}>
+              <span style={{ fontSize:18 }}>📹</span> Gravar agora
+            </button>
+            <button onClick={()=>setStep(1)} style={{ width:'100%', padding:'12px', borderRadius:10, background:C.red, border:'none', color:'white', fontWeight:700, fontSize:14, cursor:'pointer', fontFamily:'Outfit,sans-serif' }}>
+              Continuar →
+            </button>
+          </div>
+        )}
+
+        {step === 1 && (
+          <div style={{ display:'flex', flexDirection:'column', gap:12 }}>
+            <h3 style={{ fontSize:13, fontWeight:700, color:C.text }}>Tags do lance</h3>
+            <div>
+              <p style={{ fontSize:11, color:C.sub, marginBottom:6 }}>Tipo de jogada</p>
+              <div style={{ display:'flex', gap:6, flexWrap:'wrap' }}>
+                {['Gol','Assistência','Drible','Defesa','Passe-chave','Desarme'].map(t=>(
+                  <button key={t} onClick={()=>setTipo(t)} style={{ padding:'6px 12px', borderRadius:20, border:`1.5px solid ${tipo===t?C.red:C.border}`, background: tipo===t?C.red+'15':'transparent', color: tipo===t?C.red:C.sub, fontSize:11, fontWeight: tipo===t?700:400, cursor:'pointer', fontFamily:'Outfit,sans-serif' }}>{t}</button>
+                ))}
+              </div>
+            </div>
+            <div>
+              <p style={{ fontSize:11, color:C.sub, marginBottom:6 }}>Contexto</p>
+              <div style={{ display:'flex', gap:6, flexWrap:'wrap' }}>
+                {['Jogo oficial','Treino','Várzea','Peneira'].map(c=>(
+                  <button key={c} onClick={()=>setContexto(c)} style={{ padding:'6px 12px', borderRadius:20, border:`1.5px solid ${contexto===c?C.blue:C.border}`, background: contexto===c?C.blue+'15':'transparent', color: contexto===c?C.blue:C.sub, fontSize:11, fontWeight: contexto===c?700:400, cursor:'pointer', fontFamily:'Outfit,sans-serif' }}>{c}</button>
+                ))}
+              </div>
+            </div>
+            <textarea placeholder="Descrição... use #hashtags e @mencione outros atletas" style={{ borderRadius:10, border:`1.5px solid ${C.border}`, padding:'10px 12px', fontSize:12, fontFamily:'Outfit,sans-serif', color:C.text, resize:'none', height:80, outline:'none' }}/>
+            <button onClick={()=>setStep(2)} style={{ width:'100%', padding:'12px', borderRadius:10, background:C.red, border:'none', color:'white', fontWeight:700, fontSize:14, cursor:'pointer', fontFamily:'Outfit,sans-serif' }}>
+              Continuar →
+            </button>
+          </div>
+        )}
+
+        {step === 2 && (
+          <div style={{ display:'flex', flexDirection:'column', gap:12 }}>
+            <h3 style={{ fontSize:13, fontWeight:700, color:C.text }}>Confirmação</h3>
+            <VideoThumb tag={tipo||'GOL'} />
+            <div style={{ background:C.bg, borderRadius:12, padding:12 }}>
+              {[{l:'Tipo',v:tipo||'Não definido'},{l:'Contexto',v:contexto||'Não definido'},{l:'Posição',v:'Atacante'},{l:'Duração',v:'0:48'}].map((r,i)=>(
+                <div key={i} style={{ display:'flex', justifyContent:'space-between', padding:'5px 0', borderBottom: i<3?`1px solid ${C.border}`:'none' }}>
+                  <span style={{ fontSize:11, color:C.sub }}>{r.l}</span>
+                  <span style={{ fontSize:11, fontWeight:600, color:C.text }}>{r.v}</span>
+                </div>
+              ))}
+            </div>
+            <div style={{ background:`${C.blue}15`, borderRadius:12, padding:12, display:'flex', gap:8 }}>
+              <span style={{ fontSize:18 }}>🤖</span>
+              <p style={{ fontSize:11, color:C.blue, lineHeight:1.5 }}>A IA analisará seu lance e gerará métricas técnicas em até 1 minuto após o envio.</p>
+            </div>
+            <button onClick={handleUpload} style={{ width:'100%', padding:'13px', borderRadius:10, background: uploading?C.sub:C.red, border:'none', color:'white', fontWeight:700, fontSize:14, cursor: uploading?'not-allowed':'pointer', fontFamily:'Outfit,sans-serif' }}>
+              {uploading ? '⏳ Enviando...' : '📤 Publicar Lance'}
+            </button>
+          </div>
+        )}
+      </div>
+    </div>
+  );
+};
+
+// ─── 7. RANKING ───────────────────────────────────────────────────────────────
+const RankingScreen = ({ go }) => {
+  const [period, setPeriod] = useState('semanal');
+  const [pos, setPos] = useState('todos');
+  const top = [
+    { rank:1, name:'Matheus Cunha', pos:'Atacante', city:'SP', nota:94, change:'+3', badge:'🥇', bg:'#1a4a8a' },
+    { rank:2, name:'Lucas Vieira', pos:'Meio-campo', city:'RJ', nota:91, change:'+1', badge:'🥈', bg:'#2a1a6a' },
+    { rank:3, name:'Gabriel Souza', pos:'Zagueiro', city:'MG', nota:89, change:'0', badge:'🥉', bg:'#1a4a2a' },
+    ...athletes.map((a,i)=>({rank:i+4, name:a.name, pos:a.pos, city:a.city.split(',')[0], nota:a.nota, change: i===0?'+5':i===1?'-2':'+1', badge:null, bg:a.bg})),
+  ];
+  return (
+    <div style={{ flex:1, display:'flex', flexDirection:'column', background:C.bg, overflow:'hidden' }}>
+      <div style={{ padding:'12px 14px 8px', background:'white', borderBottom:`1px solid ${C.border}` }}>
+        <h2 style={{ fontSize:15, fontWeight:800, color:C.text, marginBottom:8 }}>🏆 Ranking</h2>
+        <div style={{ display:'flex', gap:6, marginBottom:8 }}>
+          {['semanal','mensal','all-time'].map(p=>(
+            <button key={p} onClick={()=>setPeriod(p)} style={{ padding:'5px 12px', borderRadius:20, border:'none', background: period===p?C.navy:C.bg, color: period===p?'white':C.sub, fontWeight: period===p?700:400, fontSize:10, cursor:'pointer', fontFamily:'Outfit,sans-serif' }}>{p}</button>
+          ))}
+        </div>
+        <div style={{ display:'flex', gap:4, flexWrap:'wrap' }}>
+          {['todos','Atacante','Meio-campo','Zagueiro','Goleiro'].map(p=>(
+            <button key={p} onClick={()=>setPos(p)} style={{ padding:'4px 9px', borderRadius:16, border:`1px solid ${pos===p?C.red:C.border}`, background: pos===p?C.red+'10':'transparent', color: pos===p?C.red:C.sub, fontSize:9, fontWeight: pos===p?700:400, cursor:'pointer', fontFamily:'Outfit,sans-serif' }}>{p}</button>
+          ))}
+        </div>
+      </div>
+
+      <div style={{ flex:1, overflowY:'auto' }}>
+        {/* Podium */}
+        <div style={{ padding:'16px 14px 8px', background:`linear-gradient(160deg, #071a0e, #0f3a1c)`, position:'relative', display:'flex', alignItems:'flex-end', justifyContent:'center', gap:8 }}>
+          <svg style={{ position:'absolute', inset:0, width:'100%', height:'100%', opacity:0.2, pointerEvents:'none' }} viewBox="0 0 300 140" preserveAspectRatio="xMidYMid slice">
+            <circle cx="150" cy="70" r="50" fill="none" stroke="white" strokeWidth="1"/>
+            <line x1="150" y1="0" x2="150" y2="140" stroke="white" strokeWidth="0.8"/>
+            <rect x="5" y="5" width="290" height="130" fill="none" stroke="white" strokeWidth="0.8"/>
+          </svg>
+          {[top[1], top[0], top[2]].map((a,i)=>{
+            const heights = [80,100,70];
+            return (
+              <div key={i} style={{ display:'flex', flexDirection:'column', alignItems:'center', gap:4, width:80 }}>
+                <Avatar name={a.name} size={i===1?44:36} bg={a.bg}/>
+                <span style={{ fontSize:i===1?16:13 }}>{a.badge}</span>
+                <span style={{ fontSize:9, color:'white', fontWeight:700, textAlign:'center' }}>{a.name.split(' ')[0]}</span>
+                <div style={{ width:'100%', height:heights[i], background: i===1?C.gold:i===0?'#C0C0C0':'#CD7F32', borderRadius:'6px 6px 0 0', display:'flex', alignItems:'center', justifyContent:'center' }}>
+                  <span style={{ fontSize:i===1?20:16, fontWeight:900, color: i===1?C.navy:'white' }}>#{[2,1,3][i]}</span>
+                </div>
+              </div>
+            );
+          })}
+        </div>
+
+        <div style={{ padding:'12px 14px 14px' }}>
+          {top.slice(3).map(a=>(
+            <div key={a.rank} onClick={()=>go('atleta', a)} style={{ background:'white', borderRadius:12, padding:'10px 12px', marginBottom:6, display:'flex', gap:10, alignItems:'center', cursor:'pointer' }}>
+              <span style={{ fontSize:13, fontWeight:800, color:C.sub, width:20 }}>#{a.rank}</span>
+              <Avatar name={a.name} size={36} bg={a.bg}/>
+              <div style={{ flex:1 }}>
+                <div style={{ fontSize:12, fontWeight:700, color:C.text }}>{a.name}</div>
+                <div style={{ fontSize:10, color:C.sub }}>{a.pos} · {a.city}</div>
+              </div>
+              <div style={{ textAlign:'right' }}>
+                <div style={{ fontSize:15, fontWeight:900, color:C.gold }}>{a.nota}</div>
+                <div style={{ fontSize:9, color: a.change.startsWith('+')?C.green:a.change==='-0'||a.change==='0'?C.sub:C.red, fontWeight:600 }}>{a.change}</div>
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+    </div>
+  );
+};
+
+// ─── 8. MEU PERFIL ────────────────────────────────────────────────────────────
+const MeuPerfilScreen = ({ go }) => {
+  const me = { name:'João Carlos Silva', pos:'Atacante', city:'São Paulo, SP', age:17, nota:87, bg:'#1a4a8a' };
+  return <AtletaScreen go={go} athlete={me} />;
+};
+
+// ─── 9. CHAT ─────────────────────────────────────────────────────────────────
+const ChatScreen = ({ go, athlete = athletes[0] }) => {
+  const [msg, setMsg] = useState('');
+  const [msgs, setMsgs] = useState([
+    { from:'them', text:'Olá! Vi seus vídeos e fiquei impressionado com seu drible.', time:'14:32' },
+    { from:'me', text:'Muito obrigado! Sou seu fã também!', time:'14:33' },
+    { from:'them', text:'Gostaria de convidá-lo para uma peneira no próximo sábado, 10h no CT do Palmeiras.', time:'14:35' },
+  ]);
+  return (
+    <div style={{ flex:1, display:'flex', flexDirection:'column', background:C.bg }}>
+      <div style={{ padding:'10px 14px', display:'flex', alignItems:'center', gap:10, background:'white', borderBottom:`1px solid ${C.border}` }}>
+        <button onClick={()=>go('atleta',athlete)} style={{ background:'none', border:'none', fontSize:18, cursor:'pointer' }}>‹</button>
+        <Avatar name={athlete.name} size={32} bg={athlete.bg}/>
+        <div>
+          <div style={{ fontSize:12, fontWeight:700, color:C.text }}>{athlete.name}</div>
+          <div style={{ fontSize:10, color:C.green }}>● Online agora</div>
+        </div>
+        <div style={{ marginLeft:'auto', fontSize:11, color:C.blue, fontWeight:600 }}>Olheiro ✓</div>
+      </div>
+      <div style={{ flex:1, overflowY:'auto', padding:'12px 14px', display:'flex', flexDirection:'column', gap:8 }}>
+        {msgs.map((m,i)=>(
+          <div key={i} style={{ display:'flex', justifyContent: m.from==='me'?'flex-end':'flex-start' }}>
+            <div style={{ maxWidth:'80%', background: m.from==='me'?C.red:'white', borderRadius: m.from==='me'?'12px 12px 2px 12px':'12px 12px 12px 2px', padding:'8px 12px', boxShadow:'0 1px 4px rgba(0,0,0,0.08)' }}>
+              <p style={{ fontSize:12, color: m.from==='me'?'white':C.text, lineHeight:1.5 }}>{m.text}</p>
+              <p style={{ fontSize:9, color: m.from==='me'?'rgba(255,255,255,0.6)':C.sub, marginTop:3, textAlign:'right' }}>{m.time}</p>
+            </div>
+          </div>
+        ))}
+        <div style={{ background:`${C.gold}20`, borderRadius:12, padding:12, border:`1px solid ${C.gold}40` }}>
+          <div style={{ fontSize:10, fontWeight:700, color:C.navy, marginBottom:4 }}>📋 Proposta Oficial</div>
+          <p style={{ fontSize:11, color:C.text, lineHeight:1.5 }}>Peneira Sub-17 · Sábado 10h · CT Palmeiras</p>
+          <div style={{ display:'flex', gap:6, marginTop:8 }}>
+            <button style={{ flex:1, padding:'6px', borderRadius:6, background:C.green, border:'none', color:'white', fontSize:11, fontWeight:700, cursor:'pointer', fontFamily:'Outfit,sans-serif' }}>Aceitar</button>
+            <button style={{ flex:1, padding:'6px', borderRadius:6, background:C.bg, border:`1px solid ${C.border}`, color:C.sub, fontSize:11, cursor:'pointer', fontFamily:'Outfit,sans-serif' }}>Recusar</button>
+          </div>
+        </div>
+      </div>
+      <div style={{ padding:'10px 14px', background:'white', borderTop:`1px solid ${C.border}`, display:'flex', gap:8, alignItems:'flex-end' }}>
+        <div style={{ flex:1, background:C.bg, borderRadius:20, padding:'8px 12px', display:'flex', alignItems:'center', gap:8 }}>
+          <input value={msg} onChange={e=>setMsg(e.target.value)} placeholder="Mensagem..." style={{ flex:1, border:'none', background:'transparent', fontSize:12, fontFamily:'Outfit,sans-serif', outline:'none', color:C.text }}/>
+          <span style={{ fontSize:16, cursor:'pointer' }}>📎</span>
+        </div>
+        <button onClick={()=>{ if(msg.trim()){ setMsgs(p=>[...p,{from:'me',text:msg,time:'agora'}]); setMsg(''); }}} style={{ width:36, height:36, borderRadius:'50%', background:C.red, border:'none', display:'flex', alignItems:'center', justifyContent:'center', cursor:'pointer', fontSize:14, color:'white' }}>▶</button>
+      </div>
+    </div>
+  );
+};
+
+// ─── 10. PROPOSTA ─────────────────────────────────────────────────────────────
+const PropostaScreen = ({ go, athlete = athletes[0] }) => (
+  <div style={{ flex:1, display:'flex', flexDirection:'column', background:'white', overflow:'hidden' }}>
+    <div style={{ padding:'10px 14px', display:'flex', alignItems:'center', gap:10, borderBottom:`1px solid ${C.border}` }}>
+      <button onClick={()=>go('atleta',athlete)} style={{ background:'none', border:'none', fontSize:18, cursor:'pointer' }}>‹</button>
+      <h2 style={{ fontSize:14, fontWeight:800, color:C.text }}>Proposta Oficial</h2>
+    </div>
+    <div style={{ flex:1, overflowY:'auto', padding:14 }}>
+      <div style={{ background:`linear-gradient(135deg, ${C.navy}, ${C.blue})`, borderRadius:14, padding:14, marginBottom:14, display:'flex', gap:10, alignItems:'center' }}>
+        <Verified size={24}/>
+        <div>
+          <div style={{ fontSize:12, fontWeight:700, color:'white' }}>Proposta Verificada</div>
+          <div style={{ fontSize:10, color:'rgba(255,255,255,0.6)' }}>Clube com credencial confirmada</div>
+        </div>
+      </div>
+      <div style={{ display:'flex', flexDirection:'column', gap:10 }}>
+        {[
+          {label:'Para',placeholder:'João Carlos Silva'},
+          {label:'Tipo de proposta',placeholder:'Peneira / Observação / Contrato'},
+          {label:'Data',placeholder:''},
+          {label:'Local',placeholder:'Endereço do CT / Campo'},
+          {label:'Posição buscada',placeholder:''},
+          {label:'Faixa etária',placeholder:''},
+        ].map((f,i)=>(
+          <div key={i}>
+            <p style={{ fontSize:10, color:C.sub, marginBottom:4 }}>{f.label}</p>
+            <input defaultValue={f.placeholder} type={f.label==='Data'?'date':'text'} style={{ width:'100%', padding:'10px 12px', borderRadius:10, border:`1.5px solid ${C.border}`, fontSize:12, fontFamily:'Outfit,sans-serif', color:C.text, outline:'none', background:C.bg }}/>
+          </div>
+        ))}
+        <div>
+          <p style={{ fontSize:10, color:C.sub, marginBottom:4 }}>Mensagem adicional</p>
+          <textarea style={{ width:'100%', height:80, padding:'10px 12px', borderRadius:10, border:`1.5px solid ${C.border}`, fontSize:12, fontFamily:'Outfit,sans-serif', color:C.text, outline:'none', resize:'none', background:C.bg }}/>
+        </div>
+      </div>
+    </div>
+    <div style={{ padding:'10px 14px', borderTop:`1px solid ${C.border}` }}>
+      <button onClick={()=>go('chat',athlete)} style={{ width:'100%', padding:'13px', borderRadius:10, background:C.red, border:'none', color:'white', fontWeight:800, fontSize:14, cursor:'pointer', fontFamily:'Outfit,sans-serif' }}>
+        📤 Enviar Proposta Oficial
+      </button>
+    </div>
+  </div>
+);
+
+// ─── 11. NOTIFICAÇÕES ─────────────────────────────────────────────────────────
+const NotifScreen = ({ go }) => {
+  const notifs = [
+    { icon:'👁', text:'Fluminense FC visualizou seu perfil', time:'2h', color:C.blue },
+    { icon:'⭐', text:'Rafael Mendes avaliou seu lance com 9/10', time:'3h', color:C.gold },
+    { icon:'💬', text:'Novo comentário no seu gol contra o Santos', time:'5h', color:C.sub },
+    { icon:'🏆', text:'Você entrou no Top 10 estadual de Atacantes!', time:'1d', color:C.red },
+    { icon:'➕', text:'Palmeiras Sub-17 começou a seguir você', time:'1d', color:C.green },
+    { icon:'🤖', text:'IA processou seu novo vídeo — nota 89!', time:'2d', color:C.purple },
+  ];
+  return (
+    <div style={{ flex:1, display:'flex', flexDirection:'column', background:C.bg, overflow:'hidden' }}>
+      <div style={{ padding:'12px 14px', background:'white', borderBottom:`1px solid ${C.border}`, display:'flex', alignItems:'center', gap:10 }}>
+        <button onClick={()=>go('feed')} style={{ background:'none', border:'none', fontSize:18, cursor:'pointer' }}>‹</button>
+        <h2 style={{ fontSize:15, fontWeight:800, color:C.text }}>Notificações</h2>
+      </div>
+      <div style={{ flex:1, overflowY:'auto', padding:'10px 14px' }}>
+        {notifs.map((n,i)=>(
+          <div key={i} style={{ background:'white', borderRadius:12, padding:'10px 12px', marginBottom:8, display:'flex', gap:10, alignItems:'center' }}>
+            <div style={{ width:36, height:36, borderRadius:'50%', background:n.color+'20', display:'flex', alignItems:'center', justifyContent:'center', fontSize:18, flexShrink:0 }}>{n.icon}</div>
+            <div style={{ flex:1 }}>
+              <p style={{ fontSize:12, color:C.text, lineHeight:1.4 }}>{n.text}</p>
+              <p style={{ fontSize:10, color:C.sub, marginTop:2 }}>{n.time} atrás</p>
+            </div>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+};
+
+// ═══════════════════════════════════════════════════════════════════════════════
+// MAIN APP
+// ═══════════════════════════════════════════════════════════════════════════════
+const MAIN_SCREENS = ['feed','busca','upload','ranking','perfil'];
+
+const App = () => {
+  const { TweaksPanel, useTweaks } = window;
+  const [tweaks] = useTweaks(TWEAK_DEFAULTS);
+  const [screen, setScreen] = useState('login');
+  const [context, setContext] = useState(null);
+  const [fullscreen, setFullscreen] = useState(false);
+
+  const go = (s, ctx = null) => { setScreen(s); setContext(ctx); };
+  const isMain = MAIN_SCREENS.includes(screen);
+
+  const renderScreen = () => {
+    switch(screen) {
+      case 'login':    return <LoginScreen go={go} />;
+      case 'feed':     return <FeedScreen go={go} />;
+      case 'atleta':   return <AtletaScreen go={go} athlete={context || athletes[0]} />;
+      case 'video':    return <VideoAnaliseScreen go={go} athlete={context || athletes[0]} />;
+      case 'busca':    return <BuscaScreen go={go} />;
+      case 'upload':   return <UploadScreen go={go} />;
+      case 'ranking':  return <RankingScreen go={go} />;
+      case 'perfil':   return <MeuPerfilScreen go={go} />;
+      case 'chat':     return <ChatScreen go={go} athlete={context || athletes[0]} />;
+      case 'proposta': return <PropostaScreen go={go} athlete={context || athletes[0]} />;
+      case 'notif':    return <NotifScreen go={go} />;
+      default:         return <FeedScreen go={go} />;
+    }
+  };
+
+  const appContent = (
+    <div style={{ flex:1, display:'flex', flexDirection:'column', background:C.bg, overflow:'hidden', height:'100%' }}>
+      {renderScreen()}
+      {isMain && screen !== 'login' && <BottomNav screen={screen} go={go} />}
+    </div>
+  );
+
+  return (
+    <div style={{ display:'flex', flexDirection:'column', height:'100vh', alignItems:'center', justifyContent:'center', position:'relative', zIndex:1 }}>
+
+      {/* Toggle button */}
+      <button
+        onClick={() => setFullscreen(f => !f)}
+        style={{
+          position: 'fixed', top: 14, right: 14, zIndex: 9999,
+          background: fullscreen ? 'rgba(255,255,255,0.15)' : 'rgba(255,255,255,0.12)',
+          border: '1.5px solid rgba(255,255,255,0.25)',
+          borderRadius: 10, padding: '7px 14px',
+          color: 'white', fontSize: 12, fontWeight: 700,
+          cursor: 'pointer', fontFamily: 'Outfit,sans-serif',
+          backdropFilter: 'blur(8px)',
+          display: 'flex', alignItems: 'center', gap: 6,
+          transition: 'all 0.2s',
+          boxShadow: '0 2px 12px rgba(0,0,0,0.3)'
+        }}
+      >
+        {fullscreen ? '📱 Ver no celular' : '🖥️ Modo desktop'}
+      </button>
+      {/* Field markings SVG layer */}
+      {!fullscreen && <svg style={{ position:'fixed', inset:0, width:'100%', height:'100%', pointerEvents:'none', zIndex:0, opacity:0.18 }} viewBox="0 0 900 600" preserveAspectRatio="xMidYMid slice">
+        <circle cx="450" cy="300" r="90" fill="none" stroke="white" strokeWidth="1.5"/>
+        <circle cx="450" cy="300" r="4" fill="white"/>
+        <line x1="450" y1="30" x2="450" y2="570" stroke="white" strokeWidth="1.5"/>
+        <rect x="30" y="30" width="840" height="540" fill="none" stroke="white" strokeWidth="1.5"/>
+        <rect x="30" y="180" width="120" height="240" fill="none" stroke="white" strokeWidth="1.2"/>
+        <rect x="750" y="180" width="120" height="240" fill="none" stroke="white" strokeWidth="1.2"/>
+        {[0,1,2,3,4,5,6,7,8,9].map(i=>(
+          <rect key={i} x={30+i*84} y="30" width="42" height="540" fill={i%2===0?"rgba(255,255,255,0.04)":"transparent"}/>
+        ))}
+      </svg>}
+      {fullscreen ? (
+        <div style={{ position:'fixed', inset:0, zIndex:10, display:'flex', flexDirection:'column', background:C.bg, maxWidth:480, margin:'0 auto', width:'100%', boxShadow:'0 0 60px rgba(0,0,0,0.5)' }}>
+          {appContent}
+        </div>
+      ) : (
+        <IOSDevice statusBarStyle="light">
+          {appContent}
+        </IOSDevice>
+      )}
+      <TweaksPanel>
+        <TweakSection title="Visual">
+          <TweakColor id="accentColor" label="Cor de destaque" />
+          <TweakToggle id="darkMode" label="Modo escuro" />
+        </TweakSection>
+        <TweakSection title="Conteúdo">
+          <TweakToggle id="showAIAnalysis" label="Mostrar análise IA" />
+          <TweakRadio id="feedStyle" label="Estilo do feed" options={['card','lista']} />
+        </TweakSection>
+      </TweaksPanel>
+    </div>
+  );
+};
+
+ReactDOM.createRoot(document.getElementById('root')).render(<App />);
+</script>
+</body>
+</html>

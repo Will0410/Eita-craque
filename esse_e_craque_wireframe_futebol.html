@@ -1,0 +1,1263 @@
+<h2 class="sr-only">Wireframe do app de olheiros com identidade visual de futebol em todas as telas.</h2>
+
+<style>
+.frame-bg {
+  background: linear-gradient(135deg, #0d4d2c 0%, #1a6b3e 50%, #0d4d2c 100%);
+  border-radius: 16px;
+  padding: 22px 14px;
+  margin-bottom: 18px;
+  position: relative;
+  overflow: hidden;
+  border: 0.5px solid rgba(255,215,0,0.3);
+}
+.frame-bg::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background-image: repeating-linear-gradient(0deg, rgba(255,255,255,0.05) 0, rgba(255,255,255,0.05) 28px, transparent 28px, transparent 56px);
+  pointer-events: none;
+}
+.frame-title {
+  color: #fff;
+  text-align: center;
+  font-size: 14px;
+  font-weight: 500;
+  margin: 0 0 14px;
+  letter-spacing: 0.5px;
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+.frame-title .badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 22px; height: 22px;
+  background: #ffd700;
+  color: #0d4d2c;
+  border-radius: 50%;
+  font-size: 11px;
+  font-weight: 500;
+  border: 1.5px solid #fff;
+}
+.phones-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+  position: relative;
+}
+.phone-wrap { display: flex; flex-direction: column; align-items: center; gap: 6px; }
+.phone-label {
+  color: #fff;
+  font-size: 10px;
+  text-align: center;
+  font-weight: 500;
+  background: rgba(0,0,0,0.4);
+  padding: 3px 8px;
+  border-radius: 10px;
+  border: 0.5px solid #ffd700;
+}
+.phone {
+  width: 100%; aspect-ratio: 9/19;
+  background: #fff; border-radius: 22px;
+  border: 3px solid #0a0a0a; padding: 7px 5px;
+  display: flex; flex-direction: column; gap: 3px;
+  position: relative; overflow: hidden;
+  font-size: 8px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+}
+.notch { width: 28px; height: 4px; background: #d0d0d0; border-radius: 2px; margin: 0 auto 3px; }
+
+/* Header com listras douradas */
+.brand-bar {
+  background: linear-gradient(90deg, #0d4d2c, #1a6b3e);
+  color: #fff;
+  text-align: center;
+  padding: 4px;
+  border-radius: 3px;
+  font-size: 8px;
+  font-weight: 500;
+  margin-bottom: 3px;
+  position: relative;
+  letter-spacing: 0.5px;
+}
+.brand-bar::after {
+  content: '';
+  position: absolute;
+  bottom: -2px; left: 4px; right: 4px;
+  height: 2px;
+  background: linear-gradient(90deg, transparent, #ffd700, transparent);
+}
+
+.screen-title {
+  font-size: 8px; font-weight: 500; text-align: center;
+  padding: 3px 0; color: #0d4d2c;
+  border-bottom: 1.5px solid #0d4d2c;
+  margin-bottom: 3px;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+}
+
+.field {
+  background: #f3f4f6;
+  border-left: 2px solid #0d4d2c;
+  border-radius: 0 3px 3px 0;
+  padding: 4px 5px;
+  font-size: 7px;
+  color: #6b7280;
+  margin-bottom: 3px;
+}
+
+.btn-primary {
+  background: #0d4d2c;
+  color: #fff;
+  border-radius: 3px;
+  padding: 4px;
+  text-align: center;
+  font-size: 7px;
+  font-weight: 500;
+  margin-top: 3px;
+  border-bottom: 2px solid #ffd700;
+}
+.btn-ghost {
+  background: #fff;
+  color: #0d4d2c;
+  border: 1px solid #0d4d2c;
+  border-radius: 3px;
+  padding: 3px;
+  text-align: center;
+  font-size: 7px;
+  font-weight: 500;
+}
+.btn-yellow {
+  background: #ffd700;
+  color: #0d4d2c;
+  border-radius: 3px;
+  padding: 4px;
+  text-align: center;
+  font-size: 7px;
+  font-weight: 500;
+}
+
+/* ESCUDO */
+.shield {
+  width: 32px;
+  height: 38px;
+  background: #0d4d2c;
+  margin: 4px auto;
+  position: relative;
+  clip-path: polygon(50% 0%, 100% 15%, 100% 60%, 50% 100%, 0% 60%, 0% 15%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 2px solid #ffd700;
+  font-size: 13px;
+  color: #ffd700;
+}
+.shield-mini {
+  width: 14px;
+  height: 16px;
+  background: #0d4d2c;
+  clip-path: polygon(50% 0%, 100% 15%, 100% 60%, 50% 100%, 0% 60%, 0% 15%);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 6px;
+  color: #ffd700;
+  flex-shrink: 0;
+}
+
+/* CAMISA com número */
+.jersey {
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #fff;
+  font-size: 10px;
+  font-weight: 500;
+  font-family: 'Arial Black', sans-serif;
+  border: 2px solid #fff;
+  box-shadow: 0 0 0 1px #0d4d2c;
+  flex-shrink: 0;
+}
+.jersey-sm {
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #fff;
+  font-size: 7px;
+  font-weight: 500;
+  font-family: 'Arial Black', sans-serif;
+  border: 1px solid #fff;
+  flex-shrink: 0;
+}
+.j-red { background: #dc2626; }
+.j-blue { background: #1e40af; }
+.j-green { background: #0d4d2c; }
+.j-yellow { background: #ffd700; color: #0d4d2c; border-color: #0d4d2c; }
+.j-purple { background: #7c3aed; }
+.j-orange { background: #ea580c; }
+.j-black { background: #1a1a1a; }
+
+/* FAIXA DE CAPITÃO */
+.captain {
+  display: inline-block;
+  background: #ffd700;
+  color: #0d4d2c;
+  font-size: 6px;
+  font-weight: 500;
+  padding: 1px 3px;
+  border-radius: 2px;
+  letter-spacing: 0.5px;
+  border: 0.5px solid #0d4d2c;
+}
+
+/* PLACAR DE ESTÁDIO */
+.scoreboard {
+  background: #0a0a0a;
+  border: 1px solid #ffd700;
+  border-radius: 4px;
+  padding: 5px;
+  text-align: center;
+  margin: 3px 0;
+  position: relative;
+}
+.scoreboard::before {
+  content: '';
+  position: absolute;
+  top: -1px; left: 4px; right: 4px;
+  height: 1px;
+  background: rgba(255,215,0,0.5);
+}
+.scoreboard .num {
+  font-family: 'Arial Black', monospace;
+  font-size: 22px;
+  font-weight: 500;
+  color: #ffd700;
+  line-height: 1;
+  letter-spacing: 2px;
+  text-shadow: 0 0 4px rgba(255,215,0,0.5);
+}
+.scoreboard .lbl {
+  font-size: 6px;
+  color: #fff;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  margin-top: 2px;
+  opacity: 0.85;
+}
+
+/* GRAMADO listrado para vídeos */
+.pitch-thumb {
+  background: linear-gradient(135deg, #0d4d2c, #1a6b3e);
+  background-image:
+    repeating-linear-gradient(90deg, rgba(255,255,255,0.08) 0, rgba(255,255,255,0.08) 4px, transparent 4px, transparent 12px),
+    linear-gradient(135deg, #0d4d2c, #1a6b3e);
+  border-radius: 3px;
+  aspect-ratio: 1;
+  flex: 1;
+  display: flex; align-items: center; justify-content: center;
+  color: #fff; font-size: 8px;
+  position: relative;
+}
+.pitch-large {
+  background: linear-gradient(135deg, #0d4d2c, #1a6b3e);
+  background-image:
+    repeating-linear-gradient(90deg, rgba(255,255,255,0.07) 0, rgba(255,255,255,0.07) 8px, transparent 8px, transparent 16px),
+    linear-gradient(135deg, #0d4d2c, #1a6b3e);
+  border-radius: 4px;
+  aspect-ratio: 16/10;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #fff;
+  font-size: 8px;
+  margin: 3px 0;
+  position: relative;
+  border: 1px solid #ffd700;
+}
+.play-btn {
+  width: 18px; height: 18px;
+  border-radius: 50%;
+  background: #ffd700;
+  color: #0d4d2c;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 9px;
+  font-weight: 500;
+}
+
+.bar { height: 4px; background: #e5e7eb; border-radius: 2px; overflow: hidden; margin-top: 1px; }
+.bar-fill { height: 100%; background: #0d4d2c; }
+.bar-fill.gold { background: #ffd700; }
+.bar-fill.amber { background: #d97706; }
+.bar-fill.gray { background: #94a3b8; }
+
+.tag {
+  display: inline-block;
+  padding: 1px 4px;
+  border-radius: 3px;
+  font-size: 6px;
+  font-weight: 500;
+  background: #fee2e2;
+  color: #991b1b;
+}
+.tag-blue { background: #dbeafe; color: #1e40af; }
+.tag-green { background: #dcfce7; color: #166534; }
+.tag-amber { background: #fef3c7; color: #92400e; }
+.tag-grass { background: #0d4d2c; color: #ffd700; }
+.tag-gold { background: #ffd700; color: #0d4d2c; }
+
+.tabs { display: flex; gap: 3px; font-size: 7px; }
+.tab { flex: 1; text-align: center; padding: 3px 0; color: #6b7280; }
+.tab.active { color: #0d4d2c; font-weight: 500; border-bottom: 2px solid #ffd700; }
+
+.row { display: flex; gap: 4px; align-items: center; }
+.spacer { flex: 1; }
+
+.section-h {
+  font-size: 7px;
+  font-weight: 500;
+  color: #0d4d2c;
+  margin: 4px 0 2px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+.section-h::before {
+  content: '';
+  width: 8px; height: 2px;
+  background: #ffd700;
+}
+
+.search-bar {
+  background: #f3f4f6;
+  border-radius: 10px;
+  padding: 3px 6px;
+  font-size: 7px;
+  color: #6b7280;
+  border: 0.5px solid #d1d5db;
+  display: flex;
+  align-items: center;
+  gap: 3px;
+}
+
+.chip {
+  background: #0d4d2c;
+  color: #fff;
+  padding: 2px 5px;
+  border-radius: 8px;
+  font-size: 6px;
+  font-weight: 500;
+}
+.chip-out {
+  background: #fff;
+  color: #0d4d2c;
+  border: 1px solid #0d4d2c;
+  padding: 2px 5px;
+  border-radius: 8px;
+  font-size: 6px;
+}
+.chip-gold {
+  background: #ffd700;
+  color: #0d4d2c;
+  padding: 2px 5px;
+  border-radius: 8px;
+  font-size: 6px;
+  font-weight: 500;
+}
+
+.tabbar {
+  display: flex;
+  justify-content: space-around;
+  padding: 4px 0;
+  border-top: 1px solid #0d4d2c;
+  margin-top: auto;
+  background: linear-gradient(180deg, #f9fafb, #f3f4f6);
+}
+.tabbar-icon { width: 10px; height: 10px; border-radius: 50%; background: #cbd5e1; }
+.tabbar-icon.active { background: #0d4d2c; box-shadow: 0 0 0 1.5px #ffd700; }
+
+.metric-pill {
+  background: linear-gradient(180deg, #f9fafb, #fff);
+  border: 0.5px solid #0d4d2c;
+  border-radius: 4px;
+  padding: 3px;
+  font-size: 6px;
+  text-align: center;
+  color: #374151;
+  flex: 1;
+}
+.metric-pill .num {
+  font-size: 10px;
+  font-weight: 500;
+  color: #0d4d2c;
+  display: block;
+  font-family: 'Arial Black', sans-serif;
+}
+
+.attr-row {
+  display: flex;
+  justify-content: space-between;
+  font-size: 7px;
+  margin-bottom: 1px;
+  color: #374151;
+}
+
+.user-name { font-size: 8px; font-weight: 500; color: #0d4d2c; }
+.user-meta { font-size: 6px; color: #6b7280; }
+
+/* Linha do gol/cobrança - efeito visual */
+.goal-line {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: 2px 0;
+  border-left: 2px solid #ffd700;
+  padding-left: 4px;
+  margin: 2px 0;
+}
+
+.medal {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 14px; height: 14px;
+  border-radius: 50%;
+  font-size: 7px;
+  font-weight: 500;
+  font-family: 'Arial Black', sans-serif;
+  flex-shrink: 0;
+}
+.medal-gold { background: linear-gradient(135deg, #ffd700, #ffaa00); color: #0d4d2c; border: 1px solid #0d4d2c; }
+.medal-silver { background: linear-gradient(135deg, #e5e7eb, #9ca3af); color: #374151; border: 1px solid #6b7280; }
+.medal-bronze { background: linear-gradient(135deg, #d97706, #92400e); color: #fff; border: 1px solid #78350f; }
+</style>
+
+<!-- ========== JORNADA 1: ONBOARDING ========== -->
+<div class="frame-bg">
+  <h3 class="frame-title"><span class="badge">1</span> Cadastro · entrando em campo</h3>
+  <div class="phones-row">
+    <div class="phone-wrap">
+      <div class="phone">
+        <div class="notch"></div>
+        <div class="shield"></div>
+        <div style="text-align:center; font-size:9px; font-weight:500; color:#0d4d2c; letter-spacing:1px;">ESSE É CRAQUE</div>
+        <div style="text-align:center; font-size:6px; color:#6b7280; margin-bottom:3px;">— DESDE 2025 —</div>
+        <div style="height:6px;"></div>
+        <div class="btn-primary">⚽ Entrar em campo</div>
+        <div class="btn-ghost">Já tenho conta</div>
+        <div style="height:5px;"></div>
+        <div style="text-align:center; font-size:6px; color:#9ca3af;">─── ou ───</div>
+        <div style="height:3px;"></div>
+        <div class="btn-ghost">Google</div>
+        <div class="btn-ghost">Apple</div>
+        <div class="spacer"></div>
+        <div style="text-align:center; font-size:6px; color:#0d4d2c; font-weight:500; letter-spacing:0.5px;">★ A NOVA REDE DOS CRAQUES ★</div>
+      </div>
+      <div class="phone-label">Tela inicial</div>
+    </div>
+
+    <div class="phone-wrap">
+      <div class="phone">
+        <div class="notch"></div>
+        <div class="screen-title">Escolha sua posição</div>
+        <div style="background:linear-gradient(90deg, #fef2f2, #fff); border:1px solid #dc2626; border-radius:4px; padding:5px; margin-bottom:3px;">
+          <div class="row">
+            <div class="jersey j-red" style="width:20px; height:20px; font-size:9px;">9</div>
+            <div>
+              <div style="font-size:8px; font-weight:500; color:#dc2626;">Atleta</div>
+              <div style="font-size:6px; color:#991b1b;">Quero ser visto</div>
+            </div>
+          </div>
+        </div>
+        <div style="background:#f9fafb; border:0.5px solid #e5e7eb; border-radius:4px; padding:5px; margin-bottom:3px;">
+          <div class="row">
+            <div class="jersey j-blue" style="width:20px; height:20px; font-size:9px;">★</div>
+            <div>
+              <div style="font-size:8px; font-weight:500; color:#0d4d2c;">Olheiro</div>
+              <div style="font-size:6px; color:#6b7280;">Caço talentos</div>
+            </div>
+          </div>
+        </div>
+        <div style="background:#f9fafb; border:0.5px solid #e5e7eb; border-radius:4px; padding:5px; margin-bottom:3px;">
+          <div class="row">
+            <div class="shield-mini"></div>
+            <div>
+              <div style="font-size:8px; font-weight:500; color:#0d4d2c;">Clube</div>
+              <div style="font-size:6px; color:#6b7280;">Recruto craques</div>
+            </div>
+          </div>
+        </div>
+        <div style="background:#f9fafb; border:0.5px solid #e5e7eb; border-radius:4px; padding:5px;">
+          <div class="row">
+            <div class="jersey j-yellow" style="width:20px; height:20px; font-size:9px;">12</div>
+            <div>
+              <div style="font-size:8px; font-weight:500; color:#0d4d2c;">Torcedor</div>
+              <div style="font-size:6px; color:#6b7280;">Curto descobrir</div>
+            </div>
+          </div>
+        </div>
+        <div class="spacer"></div>
+        <div class="btn-primary">Próximo</div>
+      </div>
+      <div class="phone-label">Tipo de conta</div>
+    </div>
+
+    <div class="phone-wrap">
+      <div class="phone">
+        <div class="notch"></div>
+        <div class="screen-title">Ficha do atleta</div>
+        <div class="field">Nome completo</div>
+        <div class="field">Data de nascimento</div>
+        <div class="field">Posição em campo ▾</div>
+        <div class="field">Pé dominante ▾</div>
+        <div class="field">Altura · Peso</div>
+        <div class="field">Cidade · Estado</div>
+        <div class="field">Clube atual</div>
+        <div style="background:#fef3c7; border-radius:3px; padding:3px; margin-top:3px;">
+          <div style="font-size:6px; color:#92400e;">☐ Aceito termos e direitos de imagem</div>
+        </div>
+        <div class="spacer"></div>
+        <div class="btn-primary">Confirmar inscrição</div>
+      </div>
+      <div class="phone-label">Súmula do atleta</div>
+    </div>
+
+    <div class="phone-wrap">
+      <div class="phone">
+        <div class="notch"></div>
+        <div class="screen-title">Verificação</div>
+        <div style="text-align:center; font-size:18px; margin:4px 0;">📧</div>
+        <div style="text-align:center; font-size:7px; color:#6b7280; margin:3px 0;">Código enviado para<br/><b style="color:#0d4d2c;">joao@email.com</b></div>
+        <div style="display:flex; gap:3px; justify-content:center; margin:6px 0;">
+          <div style="width:18px; height:24px; background:#0d4d2c; color:#ffd700; border-radius:3px; display:flex; align-items:center; justify-content:center; font-size:11px; font-weight:500; font-family:'Arial Black';">3</div>
+          <div style="width:18px; height:24px; background:#0d4d2c; color:#ffd700; border-radius:3px; display:flex; align-items:center; justify-content:center; font-size:11px; font-weight:500; font-family:'Arial Black';">7</div>
+          <div style="width:18px; height:24px; background:#0d4d2c; color:#ffd700; border-radius:3px; display:flex; align-items:center; justify-content:center; font-size:11px; font-weight:500; font-family:'Arial Black';">2</div>
+          <div style="width:18px; height:24px; background:#f3f4f6; border:1px solid #0d4d2c; border-radius:3px;"></div>
+        </div>
+        <div style="text-align:center; font-size:6px; color:#dc2626; margin-top:4px;">↻ Reenviar código</div>
+        <div class="spacer"></div>
+        <div class="btn-primary">⚽ Entrar em campo</div>
+      </div>
+      <div class="phone-label">Apito inicial</div>
+    </div>
+  </div>
+</div>
+
+<!-- ========== JORNADA 2: PERFIL DO ATLETA ========== -->
+<div class="frame-bg">
+  <h3 class="frame-title"><span class="badge">2</span> Perfil do craque</h3>
+  <div class="phones-row">
+    <div class="phone-wrap">
+      <div class="phone">
+        <div class="notch"></div>
+        <div class="brand-bar">⚽ ESSE É CRAQUE</div>
+        <div style="background:linear-gradient(135deg, #0d4d2c, #1a6b3e); border-radius:4px; padding:5px; color:#fff; position:relative;">
+          <div class="row">
+            <div class="jersey j-red">10</div>
+            <div>
+              <div style="font-size:8px; font-weight:500;">João Carlos <span class="captain">CAP</span></div>
+              <div style="font-size:6px; opacity:0.85;">Atacante · 15a · São Paulo</div>
+            </div>
+            <div class="spacer"></div>
+            <div class="shield-mini"></div>
+          </div>
+          <div style="font-size:6px; opacity:0.9; margin-top:4px; line-height:1.3; font-style:italic;">"Inspirado em Neymar, busco oportunidade."</div>
+        </div>
+        <div class="row" style="gap:3px; margin: 4px 0;">
+          <div class="metric-pill"><span class="num">12</span>jogadas</div>
+          <div class="metric-pill"><span class="num">7.4</span>nota IA</div>
+          <div class="metric-pill"><span class="num">238</span>fãs</div>
+        </div>
+        <div class="row" style="gap:3px;">
+          <div class="btn-primary" style="flex:1; margin:0;">+ Seguir</div>
+          <div class="btn-yellow" style="flex:1;">💬 Mensagem</div>
+        </div>
+        <div class="section-h">Melhores lances</div>
+        <div class="row" style="gap:3px;">
+          <div class="pitch-thumb">⚽</div>
+          <div class="pitch-thumb">▶</div>
+          <div class="pitch-thumb">▶</div>
+        </div>
+        <div class="spacer"></div>
+        <div class="tabbar">
+          <div class="tabbar-icon active"></div>
+          <div class="tabbar-icon"></div>
+          <div class="tabbar-icon"></div>
+          <div class="tabbar-icon"></div>
+        </div>
+      </div>
+      <div class="phone-label">Perfil público</div>
+    </div>
+
+    <div class="phone-wrap">
+      <div class="phone">
+        <div class="notch"></div>
+        <div class="screen-title">Placar de atributos</div>
+        <div class="scoreboard">
+          <div class="num">82</div>
+          <div class="lbl">★ NOTA GERAL ★</div>
+        </div>
+        <div style="text-align:center; font-size:6px; color:#0d4d2c; font-weight:500; margin-bottom:3px;">TOP 8% DO SUB-15</div>
+        <div class="section-h">Atributos técnicos</div>
+        <div class="attr-row"><span>Finalização</span><span style="color:#0d4d2c; font-weight:500;">88</span></div>
+        <div class="bar"><div class="bar-fill gold" style="width:88%;"></div></div>
+        <div class="attr-row" style="margin-top:3px;"><span>Drible</span><span style="color:#0d4d2c; font-weight:500;">85</span></div>
+        <div class="bar"><div class="bar-fill gold" style="width:85%;"></div></div>
+        <div class="attr-row" style="margin-top:3px;"><span>Velocidade</span><span>79</span></div>
+        <div class="bar"><div class="bar-fill" style="width:79%;"></div></div>
+        <div class="attr-row" style="margin-top:3px;"><span>Passe</span><span>74</span></div>
+        <div class="bar"><div class="bar-fill amber" style="width:74%;"></div></div>
+        <div class="attr-row" style="margin-top:3px;"><span>Defesa</span><span>62</span></div>
+        <div class="bar"><div class="bar-fill gray" style="width:62%;"></div></div>
+        <div class="section-h">Origem das notas</div>
+        <div style="font-size:6px; color:#6b7280;">🤖 IA: 60% &nbsp;·&nbsp; 👥 Comunidade: 40%</div>
+        <div class="spacer"></div>
+      </div>
+      <div class="phone-label">Sumula técnica</div>
+    </div>
+
+    <div class="phone-wrap">
+      <div class="phone">
+        <div class="notch"></div>
+        <div class="screen-title">Meu vestiário</div>
+        <div style="font-size:6px; color:#6b7280; margin-bottom:2px;">Evolução · 6 meses</div>
+        <div style="background:linear-gradient(180deg, #0d4d2c, #1a6b3e); border-radius:4px; padding:6px; height:55px; position:relative;">
+          <svg viewBox="0 0 100 30" style="width:100%; height:100%;">
+            <polyline points="0,22 17,18 33,16 50,14 67,11 83,9 100,7" stroke="#ffd700" stroke-width="1.5" fill="none"/>
+            <circle cx="100" cy="7" r="2" fill="#ffd700"/>
+            <text x="2" y="6" fill="#ffd700" font-size="3">82</text>
+            <text x="2" y="28" fill="#fff" font-size="3" opacity="0.6">70</text>
+          </svg>
+        </div>
+        <div class="row" style="gap:3px; margin-top:4px;">
+          <div class="metric-pill"><span class="num">+12</span>nota</div>
+          <div class="metric-pill"><span class="num">2.1k</span>views</div>
+        </div>
+        <div class="section-h">Dica do treinador IA</div>
+        <div style="background:#fef3c7; border-left:3px solid #ffd700; border-radius:0 3px 3px 0; padding:4px; font-size:6px; color:#92400e; line-height:1.4;">
+          🎯 Foco em <b>passe sob pressão</b> — maior espaço de evolução.
+        </div>
+        <div class="section-h">Quem visitou</div>
+        <div class="row" style="gap:3px;">
+          <div class="jersey-sm j-blue">★</div>
+          <div class="jersey-sm j-purple">★</div>
+          <div class="jersey-sm j-orange">★</div>
+          <div style="font-size:6px; color:#6b7280;">3 olheiros · 2 clubes</div>
+        </div>
+        <div class="spacer"></div>
+        <div class="tabbar">
+          <div class="tabbar-icon"></div>
+          <div class="tabbar-icon"></div>
+          <div class="tabbar-icon"></div>
+          <div class="tabbar-icon active"></div>
+        </div>
+      </div>
+      <div class="phone-label">Painel pessoal</div>
+    </div>
+
+    <div class="phone-wrap">
+      <div class="phone">
+        <div class="notch"></div>
+        <div class="screen-title">Editar ficha</div>
+        <div class="field">Bio · 240 caracteres</div>
+        <div class="field">⚽ Posição: Atacante</div>
+        <div class="field">🦵 Pé: Esquerdo</div>
+        <div class="field">📏 Altura: 1.72m</div>
+        <div class="field">🏟️ Clube: Sub-15 ABC FC</div>
+        <div class="field">+ Histórico de clubes</div>
+        <div class="field">+ Conquistas</div>
+        <div style="background:#dcfce7; border-left:2px solid #0d4d2c; border-radius:0 3px 3px 0; padding:3px; font-size:6px; color:#166534; margin-top:3px;">
+          ✓ Vídeo de apresentação fixado
+        </div>
+        <div class="spacer"></div>
+        <div class="btn-primary">Salvar alterações</div>
+      </div>
+      <div class="phone-label">Editar dados</div>
+    </div>
+  </div>
+</div>
+
+<!-- ========== JORNADA 3: UPLOAD E IA ========== -->
+<div class="frame-bg">
+  <h3 class="frame-title"><span class="badge">3</span> Postar lance · análise IA</h3>
+  <div class="phones-row">
+    <div class="phone-wrap">
+      <div class="phone">
+        <div class="notch"></div>
+        <div class="screen-title">Novo lance</div>
+        <div style="background:linear-gradient(135deg, #0d4d2c, #1a6b3e); background-image: repeating-linear-gradient(90deg, rgba(255,255,255,0.07) 0, rgba(255,255,255,0.07) 8px, transparent 8px, transparent 16px), linear-gradient(135deg, #0d4d2c, #1a6b3e); border-radius:4px; aspect-ratio:9/12; display:flex; align-items:center; justify-content:center; color:#fff; border:1px solid #ffd700; position:relative;">
+          <div style="text-align:center;">
+            <div style="font-size:20px;">📹</div>
+            <div style="font-size:7px; margin-top:3px; font-weight:500;">Tocar para gravar</div>
+            <div style="font-size:6px; opacity:0.8; margin-top:2px;">ou enviar da galeria</div>
+          </div>
+          <div style="position:absolute; top:4px; left:4px; background:#dc2626; color:#fff; font-size:6px; padding:1px 4px; border-radius:2px; font-weight:500;">● REC</div>
+        </div>
+        <div class="row" style="gap:3px; margin-top:4px;">
+          <div class="chip">✂ Cortar</div>
+          <div class="chip-out">Capa</div>
+          <div class="chip-out">Zoom</div>
+        </div>
+        <div style="font-size:6px; color:#6b7280; margin-top:4px; text-align:center;">⏱ Limite: 3 minutos</div>
+        <div class="spacer"></div>
+        <div class="btn-primary">Continuar</div>
+      </div>
+      <div class="phone-label">Gravar lance</div>
+    </div>
+
+    <div class="phone-wrap">
+      <div class="phone">
+        <div class="notch"></div>
+        <div class="screen-title">Detalhes do lance</div>
+        <div style="font-size:7px; font-weight:500; color:#0d4d2c; margin-bottom:2px;">⚽ Tipo de jogada</div>
+        <div style="display:flex; gap:3px; flex-wrap:wrap;">
+          <div class="chip-gold">⚽ Gol</div>
+          <div class="chip-out">🔄 Drible</div>
+          <div class="chip-out">🥅 Defesa</div>
+          <div class="chip-out">→ Passe</div>
+        </div>
+        <div style="font-size:7px; font-weight:500; color:#0d4d2c; margin:5px 0 2px;">🏟️ Contexto</div>
+        <div style="display:flex; gap:3px; flex-wrap:wrap;">
+          <div class="chip-out">Treino</div>
+          <div class="chip">Jogo oficial</div>
+          <div class="chip-out">Várzea</div>
+        </div>
+        <div class="field" style="margin-top:5px;">Posição em campo ▾</div>
+        <div class="field">Descrição opcional</div>
+        <div style="font-size:6px; color:#6b7280; margin-top:2px;">📍 São Paulo, SP</div>
+        <div class="spacer"></div>
+        <div class="btn-primary">Publicar lance</div>
+      </div>
+      <div class="phone-label">Tags da jogada</div>
+    </div>
+
+    <div class="phone-wrap">
+      <div class="phone">
+        <div class="notch"></div>
+        <div class="screen-title">VAR analisando</div>
+        <div style="text-align:center; margin-top:14px;">
+          <div style="width:50px; height:50px; border-radius:50%; border:4px solid #fef3c7; border-top-color:#ffd700; margin:0 auto;"></div>
+        </div>
+        <div style="text-align:center; font-size:8px; font-weight:500; color:#0d4d2c; margin-top:8px; letter-spacing:0.5px;">🤖 IA PROCESSANDO</div>
+        <div style="background:linear-gradient(135deg, #f9fafb, #fff); border:0.5px solid #0d4d2c; border-radius:3px; padding:5px; margin-top:8px; font-size:6px; color:#374151; line-height:1.6;">
+          ✓ Detectando jogador<br/>
+          ✓ Rastreando movimento<br/>
+          ⏳ Avaliando técnica<br/>
+          ○ Gerando relatório
+        </div>
+        <div style="font-size:6px; color:#6b7280; text-align:center; margin-top:6px;">⏱ ~30 segundos</div>
+        <div class="spacer"></div>
+        <div style="text-align:center; font-size:6px; color:#0d4d2c; font-weight:500;">★ ESSE É CRAQUE ★</div>
+      </div>
+      <div class="phone-label">Análise IA</div>
+    </div>
+
+    <div class="phone-wrap">
+      <div class="phone">
+        <div class="notch"></div>
+        <div class="screen-title">Súmula da IA</div>
+        <div class="scoreboard">
+          <div class="num">86</div>
+          <div class="lbl">NOTA DO LANCE</div>
+        </div>
+        <div class="attr-row"><span>Finalização</span><span style="color:#0d4d2c; font-weight:500;">92 ▲</span></div>
+        <div class="bar"><div class="bar-fill gold" style="width:92%;"></div></div>
+        <div class="attr-row" style="margin-top:2px;"><span>Decisão</span><span>84</span></div>
+        <div class="bar"><div class="bar-fill" style="width:84%;"></div></div>
+        <div class="attr-row" style="margin-top:2px;"><span>Postura</span><span>78</span></div>
+        <div class="bar"><div class="bar-fill amber" style="width:78%;"></div></div>
+        <div class="section-h">Pontos fortes</div>
+        <div style="font-size:6px; color:#166534; line-height:1.4;">✓ Boa cobertura de área<br/>✓ Finalização precisa</div>
+        <div class="section-h">A melhorar</div>
+        <div style="font-size:6px; color:#92400e; line-height:1.4;">○ Postura corporal no recuo</div>
+        <div class="spacer"></div>
+        <div class="row" style="gap:3px;">
+          <div class="btn-ghost" style="flex:1;">Contestar</div>
+          <div class="btn-primary" style="flex:1; margin:0;">Publicar</div>
+        </div>
+      </div>
+      <div class="phone-label">Relatório</div>
+    </div>
+  </div>
+</div>
+
+<!-- ========== JORNADA 4: FEED E COMUNIDADE ========== -->
+<div class="frame-bg">
+  <h3 class="frame-title"><span class="badge">4</span> Tribuna · feed e avaliações</h3>
+  <div class="phones-row">
+    <div class="phone-wrap">
+      <div class="phone">
+        <div class="notch"></div>
+        <div class="row" style="padding:2px 0;">
+          <div class="shield-mini"></div>
+          <div style="font-size:8px; font-weight:500; color:#0d4d2c; letter-spacing:0.5px;">ESSE É CRAQUE</div>
+          <div class="spacer"></div>
+          <div style="font-size:9px;">🔔</div>
+        </div>
+        <div class="tabs" style="margin: 3px 0; border-bottom:1px solid #e5e7eb;">
+          <div class="tab active">Pra você</div>
+          <div class="tab">Seguindo</div>
+          <div class="tab">Em alta</div>
+        </div>
+        <div class="row" style="gap:3px;">
+          <div class="jersey-sm j-red">10</div>
+          <div class="user-name" style="font-size:7px;">João Carlos</div>
+          <div class="user-meta">· 2h</div>
+          <div class="spacer"></div>
+          <div class="tag-grass tag">⚽ Gol</div>
+        </div>
+        <div class="pitch-large"><div class="play-btn">▶</div></div>
+        <div style="font-size:6px; color:#374151; line-height:1.3;">Gol de cobertura no sub-15...</div>
+        <div class="row" style="gap:6px; margin-top:3px; font-size:7px; color:#0d4d2c;">
+          <div>♥ 1.2k</div>
+          <div>💬 84</div>
+          <div>↗ 12</div>
+          <div class="spacer"></div>
+          <div style="color:#ffd700; background:#0d4d2c; padding:1px 4px; border-radius:3px; font-weight:500;">★ Avaliar</div>
+        </div>
+        <div class="spacer"></div>
+        <div class="tabbar">
+          <div class="tabbar-icon active"></div>
+          <div class="tabbar-icon"></div>
+          <div class="tabbar-icon"></div>
+          <div class="tabbar-icon"></div>
+        </div>
+      </div>
+      <div class="phone-label">Feed da tribuna</div>
+    </div>
+
+    <div class="phone-wrap">
+      <div class="phone" style="background:#0a0a0a; padding:0; border-color:#0a0a0a;">
+        <div class="notch" style="background:#475569; margin-top:6px;"></div>
+        <div style="position:relative; flex:1; background:linear-gradient(135deg,#0d4d2c,#1a6b3e); background-image: repeating-linear-gradient(90deg, rgba(255,255,255,0.07) 0, rgba(255,255,255,0.07) 8px, transparent 8px, transparent 16px), linear-gradient(135deg,#0d4d2c,#1a6b3e); display:flex; flex-direction:column; padding:6px; color:#fff;">
+          <div style="font-size:8px;">←</div>
+          <div class="spacer"></div>
+          <div style="position:absolute; right:6px; bottom:50px; display:flex; flex-direction:column; gap:7px; align-items:center;">
+            <div style="font-size:13px; color:#dc2626;">♥</div>
+            <div style="font-size:6px;">1.2k</div>
+            <div style="font-size:13px;">💬</div>
+            <div style="font-size:6px;">84</div>
+            <div style="font-size:13px; color:#ffd700;">★</div>
+          </div>
+          <div class="row" style="gap:3px;">
+            <div class="jersey-sm j-red">10</div>
+            <div style="font-size:7px; font-weight:500;">João Carlos <span class="captain">CAP</span></div>
+          </div>
+          <div style="font-size:6px; opacity:0.85; margin-top:2px;">⚽ Gol · jogo oficial · sub-15</div>
+          <div style="background:#ffd700; color:#0d4d2c; border-radius:3px; padding:3px 6px; margin-top:5px; font-size:6px; display:inline-block; align-self:flex-start; font-weight:500;">
+            ★ Avalie este lance
+          </div>
+        </div>
+      </div>
+      <div class="phone-label">Lance em foco</div>
+    </div>
+
+    <div class="phone-wrap">
+      <div class="phone">
+        <div class="notch"></div>
+        <div class="screen-title">Avaliar lance</div>
+        <div style="font-size:6px; color:#6b7280; margin-bottom:3px; line-height:1.3;">Sua opinião conta — peso ajustado pelo histórico.</div>
+        <div class="attr-row"><span>Finalização</span><span style="color:#0d4d2c; font-weight:500;">9</span></div>
+        <div style="display:flex; gap:1px;">
+          <span style="font-size:9px; color:#ffd700;">★★★★★</span>
+          <span style="font-size:9px; color:#ffd700;">★★★★</span>
+          <span style="font-size:9px; color:#e5e7eb;">★</span>
+        </div>
+        <div class="attr-row" style="margin-top:4px;"><span>Drible</span><span style="color:#0d4d2c; font-weight:500;">7</span></div>
+        <div class="bar"><div class="bar-fill gold" style="width:70%;"></div></div>
+        <div class="attr-row" style="margin-top:3px;"><span>Decisão</span><span style="color:#0d4d2c; font-weight:500;">8</span></div>
+        <div class="bar"><div class="bar-fill gold" style="width:80%;"></div></div>
+        <div class="section-h">Reações rápidas</div>
+        <div style="display:flex; gap:3px; flex-wrap:wrap;">
+          <div class="chip">Boa decisão</div>
+          <div class="chip-out">Drible</div>
+          <div class="chip-out">Postura</div>
+        </div>
+        <div class="field" style="margin-top:4px;">Comentário opcional</div>
+        <div class="spacer"></div>
+        <div class="btn-primary">⚽ Enviar avaliação</div>
+      </div>
+      <div class="phone-label">Avaliar técnica</div>
+    </div>
+
+    <div class="phone-wrap">
+      <div class="phone">
+        <div class="notch"></div>
+        <div class="screen-title">Tribuna · 84</div>
+        <div class="row" style="padding:3px 0; border-bottom:0.5px solid #f3f4f6; align-items:flex-start;">
+          <div class="jersey-sm j-blue">★</div>
+          <div style="flex:1;">
+            <div style="font-size:7px;"><b>Carlos M.</b> <span class="tag-blue tag">✓ olheiro</span></div>
+            <div style="font-size:6px; color:#374151;">Drible com mudança excelente</div>
+            <div style="font-size:6px; color:#9ca3af;">2h · ♥ 24</div>
+          </div>
+        </div>
+        <div class="row" style="padding:3px 0; border-bottom:0.5px solid #f3f4f6; align-items:flex-start;">
+          <div class="jersey-sm j-green">T</div>
+          <div style="flex:1;">
+            <div style="font-size:7px;"><b>Prof. Ana</b></div>
+            <div style="font-size:6px; color:#374151;">Trabalhar postura no recuo</div>
+            <div style="font-size:6px; color:#9ca3af;">1h · ♥ 8</div>
+          </div>
+        </div>
+        <div class="row" style="padding:3px 0; align-items:flex-start;">
+          <div class="jersey-sm j-yellow">12</div>
+          <div style="flex:1;">
+            <div style="font-size:7px;"><b>Pedro</b></div>
+            <div style="font-size:6px; color:#374151;">Esse moleque vai longe! ⚽🔥</div>
+            <div style="font-size:6px; color:#9ca3af;">30m · ♥ 3</div>
+          </div>
+        </div>
+        <div class="spacer"></div>
+        <div class="field">Adicionar comentário...</div>
+      </div>
+      <div class="phone-label">Discussão</div>
+    </div>
+  </div>
+</div>
+
+<!-- ========== JORNADA 5: DESCOBERTA ========== -->
+<div class="frame-bg">
+  <h3 class="frame-title"><span class="badge">5</span> Olheiro em ação</h3>
+  <div class="phones-row">
+    <div class="phone-wrap">
+      <div class="phone">
+        <div class="notch"></div>
+        <div class="screen-title">Garimpar talentos</div>
+        <div class="search-bar">🔍 Posição, nome, cidade...</div>
+        <div class="section-h">Filtros ativos</div>
+        <div style="display:flex; gap:3px; flex-wrap:wrap;">
+          <div class="chip">⚽ Atacante</div>
+          <div class="chip">≤ 17 anos</div>
+          <div class="chip">SP · 200km</div>
+          <div class="chip-out">+ filtro</div>
+        </div>
+        <div class="section-h">Faixa de nota</div>
+        <div style="background:#f3f4f6; height:6px; border-radius:3px; position:relative; margin:3px 0; border:0.5px solid #d1d5db;">
+          <div style="position:absolute; left:50%; right:5%; top:0; bottom:0; background:linear-gradient(90deg, #0d4d2c, #ffd700); border-radius:3px;"></div>
+        </div>
+        <div style="display:flex; justify-content:space-between; font-size:6px; color:#6b7280;">
+          <span>50</span><span style="color:#0d4d2c; font-weight:500;">75 — 95</span><span>100</span>
+        </div>
+        <div class="section-h">Atributo prioritário</div>
+        <div style="display:flex; gap:3px; flex-wrap:wrap;">
+          <div class="chip-gold">⚽ Finalização</div>
+          <div class="chip-out">⚡ Velocidade</div>
+        </div>
+        <div class="spacer"></div>
+        <div class="btn-primary">Aplicar (24)</div>
+      </div>
+      <div class="phone-label">Filtros do olheiro</div>
+    </div>
+
+    <div class="phone-wrap">
+      <div class="phone">
+        <div class="notch"></div>
+        <div class="screen-title">24 craques</div>
+        <div style="font-size:6px; color:#6b7280; margin-bottom:2px;">Ordenar: nota ▾</div>
+        <div class="row" style="gap:4px; padding:4px 0; border-bottom:0.5px solid #f3f4f6; background:#fffbeb; border-left:3px solid #ffd700; padding-left:4px;">
+          <div class="jersey-sm j-red">10</div>
+          <div style="flex:1;">
+            <div class="user-name" style="font-size:8px;">João Carlos <span class="captain">CAP</span></div>
+            <div class="user-meta">Atacante · 15a · SP</div>
+            <div style="font-size:6px; color:#0d4d2c; font-weight:500; margin-top:1px;">⭐ 82 · top 8%</div>
+          </div>
+          <div style="font-size:8px; color:#0d4d2c;">→</div>
+        </div>
+        <div class="row" style="gap:4px; padding:4px 0; border-bottom:0.5px solid #f3f4f6;">
+          <div class="jersey-sm j-blue">9</div>
+          <div style="flex:1;">
+            <div class="user-name" style="font-size:8px;">Lucas Pereira</div>
+            <div class="user-meta">Atacante · 16a · SP</div>
+            <div style="font-size:6px; color:#0d4d2c; font-weight:500; margin-top:1px;">⭐ 80</div>
+          </div>
+          <div style="font-size:8px; color:#0d4d2c;">→</div>
+        </div>
+        <div class="row" style="gap:4px; padding:4px 0; border-bottom:0.5px solid #f3f4f6;">
+          <div class="jersey-sm j-green">11</div>
+          <div style="flex:1;">
+            <div class="user-name" style="font-size:8px;">Matheus S.</div>
+            <div class="user-meta">Atacante · 17a · MG</div>
+            <div style="font-size:6px; color:#0d4d2c; font-weight:500; margin-top:1px;">⭐ 79</div>
+          </div>
+          <div style="font-size:8px; color:#0d4d2c;">→</div>
+        </div>
+        <div class="row" style="gap:4px; padding:4px 0;">
+          <div class="jersey-sm j-purple">7</div>
+          <div style="flex:1;">
+            <div class="user-name" style="font-size:8px;">Rafael L.</div>
+            <div class="user-meta">Atacante · 16a · RJ</div>
+            <div style="font-size:6px; color:#0d4d2c; font-weight:500; margin-top:1px;">⭐ 78</div>
+          </div>
+          <div style="font-size:8px; color:#0d4d2c;">→</div>
+        </div>
+        <div class="spacer"></div>
+        <div class="tabbar">
+          <div class="tabbar-icon"></div>
+          <div class="tabbar-icon active"></div>
+          <div class="tabbar-icon"></div>
+          <div class="tabbar-icon"></div>
+        </div>
+      </div>
+      <div class="phone-label">Resultados</div>
+    </div>
+
+    <div class="phone-wrap">
+      <div class="phone">
+        <div class="notch"></div>
+        <div class="screen-title">Convocação</div>
+        <div style="background:linear-gradient(90deg, #fffbeb, #fff); border-left:3px solid #ffd700; border-radius:0 4px 4px 0; padding:5px; margin-bottom:3px;">
+          <div class="row">
+            <div style="font-size:11px;">⭐</div>
+            <div style="flex:1;">
+              <div style="font-size:8px; font-weight:500; color:#0d4d2c;">Atacantes sub-17</div>
+              <div style="font-size:6px; color:#6b7280;">12 atletas · hoje</div>
+            </div>
+          </div>
+        </div>
+        <div style="background:#f9fafb; border-radius:4px; padding:5px; margin-bottom:3px; border:0.5px solid #e5e7eb;">
+          <div class="row">
+            <div style="font-size:11px;">📌</div>
+            <div style="flex:1;">
+              <div style="font-size:8px; font-weight:500; color:#0d4d2c;">Goleiros canhotos</div>
+              <div style="font-size:6px; color:#6b7280;">5 atletas · 3 dias</div>
+            </div>
+          </div>
+        </div>
+        <div style="background:#f9fafb; border-radius:4px; padding:5px; border:0.5px solid #e5e7eb;">
+          <div class="row">
+            <div style="font-size:11px;">🔔</div>
+            <div style="flex:1;">
+              <div style="font-size:8px; font-weight:500; color:#0d4d2c;">Alerta ativo</div>
+              <div style="font-size:6px; color:#6b7280;">Zagueiros sub-15 · &gt;85</div>
+            </div>
+          </div>
+        </div>
+        <div style="background:#dcfce7; border-left:2px solid #0d4d2c; border-radius:0 3px 3px 0; padding:4px; margin-top:4px; font-size:6px; color:#166534; font-weight:500;">
+          🆕 2 novos talentos no alerta!
+        </div>
+        <div class="spacer"></div>
+        <div class="btn-ghost">+ Nova convocação</div>
+      </div>
+      <div class="phone-label">Listas e alertas</div>
+    </div>
+
+    <div class="phone-wrap">
+      <div class="phone">
+        <div class="notch"></div>
+        <div class="screen-title">Súmula do atleta</div>
+        <div style="text-align:center; padding:3px 0;">
+          <div class="jersey j-red" style="margin: 0 auto;">10</div>
+          <div class="user-name" style="margin-top:3px;">João Carlos <span class="captain">CAP</span></div>
+          <div class="user-meta">Atacante · 15a · 1.72m</div>
+        </div>
+        <div class="row" style="gap:3px;">
+          <div class="metric-pill"><span class="num">82</span>geral</div>
+          <div class="metric-pill"><span class="num">88</span>finaliz.</div>
+          <div class="metric-pill"><span class="num">12</span>lances</div>
+        </div>
+        <div class="section-h">Carreira</div>
+        <div style="font-size:6px; color:#374151; line-height:1.5;">
+          <div class="goal-line">⚽ 2024 — Sub-15 ABC FC</div>
+          <div class="goal-line">⚽ 2023 — Esc. Bola na Rede</div>
+          <div class="goal-line">🏆 Artilheiro estadual</div>
+        </div>
+        <div class="section-h">Resumo IA</div>
+        <div style="font-size:6px; color:#374151; line-height:1.4; background:linear-gradient(90deg, #fffbeb, #fff); border-left:2px solid #ffd700; border-radius:0 3px 3px 0; padding:4px;">
+          Atacante canhoto com finalização acima da média. Evolução consistente.
+        </div>
+        <div class="spacer"></div>
+        <div class="row" style="gap:3px;">
+          <div class="btn-ghost" style="flex:1;">📄 PDF</div>
+          <div class="btn-primary" style="flex:1; margin:0;">💬 Contatar</div>
+        </div>
+      </div>
+      <div class="phone-label">Ficha técnica</div>
+    </div>
+  </div>
+</div>
+
+<!-- ========== JORNADA 6: PROPOSTAS E RANKING ========== -->
+<div class="frame-bg">
+  <h3 class="frame-title"><span class="badge">6</span> Convocações e ranking</h3>
+  <div class="phones-row">
+    <div class="phone-wrap">
+      <div class="phone">
+        <div class="notch"></div>
+        <div class="screen-title">Caixa postal</div>
+        <div class="tabs" style="margin: 0 0 3px;">
+          <div class="tab active">Propostas</div>
+          <div class="tab">Conversas</div>
+        </div>
+        <div style="background:linear-gradient(135deg, #fef3c7, #fffbeb); border:1px solid #ffd700; border-radius:4px; padding:5px; margin-bottom:3px;">
+          <div class="row">
+            <div class="shield-mini"></div>
+            <div style="font-size:7px; font-weight:500; color:#0d4d2c;">ABC Futebol Clube</div>
+            <div class="spacer"></div>
+            <div class="tag-gold tag">OFICIAL</div>
+          </div>
+          <div style="font-size:6px; color:#92400e; margin-top:3px;">⚽ Convite para peneira oficial</div>
+          <div style="font-size:6px; color:#92400e; margin-top:1px;">📅 15/maio · 14h · CT do clube</div>
+          <div class="row" style="gap:3px; margin-top:4px;">
+            <div class="btn-ghost" style="flex:1; padding:2px;">Recusar</div>
+            <div class="btn-primary" style="flex:1; padding:2px; margin:0;">Aceitar</div>
+          </div>
+        </div>
+        <div style="background:#dbeafe; border:0.5px solid #93c5fd; border-radius:4px; padding:5px;">
+          <div class="row">
+            <div class="jersey-sm j-blue">★</div>
+            <div style="font-size:7px; font-weight:500; color:#1e40af;">Carlos Mendes <span class="tag-blue tag">✓</span></div>
+          </div>
+          <div style="font-size:6px; color:#1e40af; margin-top:2px;">Olheiro pediu mais vídeos</div>
+        </div>
+        <div class="spacer"></div>
+        <div class="tabbar">
+          <div class="tabbar-icon"></div>
+          <div class="tabbar-icon"></div>
+          <div class="tabbar-icon active"></div>
+          <div class="tabbar-icon"></div>
+        </div>
+      </div>
+      <div class="phone-label">Propostas</div>
+    </div>
+
+    <div class="phone-wrap">
+      <div class="phone">
+        <div class="notch"></div>
+        <div class="row" style="padding:2px 0; border-bottom:1px solid #e5e7eb;">
+          <div style="font-size:8px;">←</div>
+          <div class="jersey-sm j-blue">★</div>
+          <div style="flex:1;">
+            <div class="user-name" style="font-size:7px;">Carlos M. <span class="tag-blue tag">✓</span></div>
+            <div class="user-meta">São Paulo FC</div>
+          </div>
+        </div>
+        <div style="background:#fef3c7; border-left:2px solid #ffd700; border-radius:0 3px 3px 0; padding:4px; font-size:6px; color:#92400e; margin:4px 0; line-height:1.3;">
+          ℹ️ Mensagens com menores incluem responsável.
+        </div>
+        <div style="background:#f3f4f6; border-radius:8px 8px 8px 2px; padding:4px 6px; font-size:6px; color:#374151; margin: 2px 0; max-width:75%; align-self:flex-start;">
+          Vi seu lance contra o XYZ. Muito bom! ⚽
+        </div>
+        <div style="background:#0d4d2c; color:#fff; border-radius:8px 8px 2px 8px; padding:4px 6px; font-size:6px; margin: 2px 0 2px auto; max-width:75%;">
+          Obrigado, mestre! 🙏
+        </div>
+        <div style="background:#f3f4f6; border-radius:8px 8px 8px 2px; padding:4px 6px; font-size:6px; color:#374151; margin: 2px 0; max-width:75%;">
+          Manda mais vídeos de drible!
+        </div>
+        <div class="spacer"></div>
+        <div class="row" style="gap:3px;">
+          <div class="field" style="flex:1; margin:0;">Mensagem...</div>
+          <div style="font-size:11px; color:#0d4d2c;">↗</div>
+        </div>
+      </div>
+      <div class="phone-label">Chat olheiro</div>
+    </div>
+
+    <div class="phone-wrap">
+      <div class="phone">
+        <div class="notch"></div>
+        <div class="screen-title">🏆 Ranking</div>
+        <div class="tabs" style="margin: 0 0 3px;">
+          <div class="tab active">Sub-15</div>
+          <div class="tab">SP</div>
+          <div class="tab">Atacante</div>
+        </div>
+        <div class="row" style="gap:4px; padding:4px; background:linear-gradient(90deg, #fef3c7, #fffbeb); border-radius:4px; border:1px solid #ffd700;">
+          <div class="medal medal-gold">1</div>
+          <div class="jersey-sm j-red">10</div>
+          <div style="flex:1; font-size:7px; font-weight:500; color:#0d4d2c;">João Carlos</div>
+          <div style="font-size:9px; color:#0d4d2c; font-weight:500; font-family:'Arial Black';">82</div>
+        </div>
+        <div class="row" style="gap:4px; padding:3px 4px; margin-top:2px;">
+          <div class="medal medal-silver">2</div>
+          <div class="jersey-sm j-blue">9</div>
+          <div style="flex:1; font-size:7px; color:#374151;">Lucas P.</div>
+          <div style="font-size:8px; color:#0d4d2c; font-family:'Arial Black';">80</div>
+        </div>
+        <div class="row" style="gap:4px; padding:3px 4px;">
+          <div class="medal medal-bronze">3</div>
+          <div class="jersey-sm j-green">11</div>
+          <div style="flex:1; font-size:7px; color:#374151;">Matheus S.</div>
+          <div style="font-size:8px; color:#0d4d2c; font-family:'Arial Black';">79</div>
+        </div>
+        <div class="row" style="gap:4px; padding:3px 4px;">
+          <div style="width:14px; text-align:center; font-size:7px; color:#6b7280; font-weight:500;">4</div>
+          <div class="jersey-sm j-purple">7</div>
+          <div style="flex:1; font-size:7px; color:#374151;">Rafael L.</div>
+          <div style="font-size:8px; color:#374151; font-family:'Arial Black';">78</div>
+        </div>
+        <div class="section-h">Suas medalhas</div>
+        <div style="display:flex; gap:3px; flex-wrap:wrap;">
+          <div class="tag tag-gold">🏆 Top 10</div>
+          <div class="tag tag-amber">🔥 1k views</div>
+          <div class="tag tag-green">⚽ Estreante</div>
+        </div>
+        <div class="spacer"></div>
+      </div>
+      <div class="phone-label">Pódio · medalhas</div>
+    </div>
+
+    <div class="phone-wrap">
+      <div class="phone">
+        <div class="notch"></div>
+        <div class="screen-title">Mural</div>
+        <div class="row" style="gap:4px; padding:3px 0; border-bottom:0.5px solid #f3f4f6;">
+          <div style="font-size:9px; color:#1e40af;">🔍</div>
+          <div style="flex:1;">
+            <div style="font-weight:500; color:#0d4d2c; font-size:7px;">Olheiro visitou seu perfil</div>
+            <div style="color:#9ca3af; font-size:6px;">há 5 min</div>
+          </div>
+        </div>
+        <div class="row" style="gap:4px; padding:3px 0; border-bottom:0.5px solid #f3f4f6;">
+          <div class="shield-mini"></div>
+          <div style="flex:1;">
+            <div style="font-weight:500; color:#0d4d2c; font-size:7px;">ABC FC enviou proposta</div>
+            <div style="color:#9ca3af; font-size:6px;">há 1h</div>
+          </div>
+        </div>
+        <div class="row" style="gap:4px; padding:3px 0; border-bottom:0.5px solid #f3f4f6; background:#fffbeb; border-radius:3px; padding-left:4px;">
+          <div style="font-size:9px;">🏆</div>
+          <div style="flex:1;">
+            <div style="font-weight:500; color:#0d4d2c; font-size:7px;">Subiu para top 10!</div>
+            <div style="color:#92400e; font-size:6px;">há 3h</div>
+          </div>
+        </div>
+        <div class="row" style="gap:4px; padding:3px 0; border-bottom:0.5px solid #f3f4f6;">
+          <div style="font-size:9px; color:#dc2626;">♥</div>
+          <div style="flex:1;">
+            <div style="font-weight:500; color:#0d4d2c; font-size:7px;">+47 curtidas no lance</div>
+            <div style="color:#9ca3af; font-size:6px;">ontem</div>
+          </div>
+        </div>
+        <div class="row" style="gap:4px; padding:3px 0;">
+          <div style="font-size:9px;">⚽</div>
+          <div style="flex:1;">
+            <div style="font-weight:500; color:#0d4d2c; font-size:7px;">Desafio: drible da semana</div>
+            <div style="color:#9ca3af; font-size:6px;">2 dias</div>
+          </div>
+        </div>
+        <div class="spacer"></div>
+        <div class="tabbar">
+          <div class="tabbar-icon"></div>
+          <div class="tabbar-icon"></div>
+          <div class="tabbar-icon"></div>
+          <div class="tabbar-icon active"></div>
+        </div>
+      </div>
+      <div class="phone-label">Mural do estádio</div>
+    </div>
+  </div>
+</div>
